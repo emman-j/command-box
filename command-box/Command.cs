@@ -19,6 +19,8 @@ namespace command_box
 
         public CommandType Type { get; }
 
+        public override string ToString() => $"{Name}";
+
         public Command(string name, string description, string path, string usage, CommandType type) 
         { 
             Name = name;
@@ -32,7 +34,6 @@ namespace command_box
         {
             ProcessStartInfo psi = new ProcessStartInfo();
             string argString = string.Join(" ", args);
-
 
             switch (Type)
             {
