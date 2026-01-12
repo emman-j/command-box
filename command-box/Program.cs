@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 
 namespace command_box
 {
@@ -6,12 +7,12 @@ namespace command_box
     {
         static void Main(string[] args)
         {
-            CommandsManager commandsManager = new CommandsManager();
-
+            CommandsManager commandsManager = new CommandsManager(WriteLine);
             while (true)
             { 
                 if (args.Length == 0)
                 {
+                    Write("> ");
                     string input = ReadLineWithAutoComplete(commandsManager.Commands);
 
                     if (string.IsNullOrWhiteSpace(input))
@@ -53,6 +54,7 @@ namespace command_box
             int currentIndex = 0;
             int matchIndex = 0;
             string lastmatchInput = string.Empty;
+            int promptLength = 2; // Length of "> "
 
             while (true)
             {
@@ -70,16 +72,15 @@ namespace command_box
                     if (string.IsNullOrWhiteSpace(lastmatchInput))
                         lastmatchInput = currentInput;
 
-
                     var matches = commands
                         .Where(c => c.Name.StartsWith(currentInput, StringComparison.OrdinalIgnoreCase))
                         .OrderBy(c => c.Name)
                         .ToList();
 
-                    if(matches.Count == 0)
+                    if (matches.Count == 0)
                         continue;
 
-                    ClearCurrentLine();
+                    ClearCurrentLine(promptLength);
                     input.Clear();
                     if (matches.Count == 1)
                     {
@@ -89,7 +90,7 @@ namespace command_box
                     }
                     else if (matches.Count > 1)
                     {
-                        // Multiple matches - show options
+                        // Multiple matches - cycle through
 
                         if (matchIndex >= matches.Count)
                             matchIndex = 0;
@@ -98,7 +99,7 @@ namespace command_box
                         currentIndex = input.Length;
                         matchIndex++;
                     }
-                    Console.Write(input.ToString());
+                    Write("> " + input.ToString());
                 }
                 else if (key.Key == ConsoleKey.Backspace)
                 {
@@ -108,12 +109,12 @@ namespace command_box
                     {
                         input.Remove(currentIndex - 1, 1);
                         currentIndex--;
-                        ClearCurrentLine();
-                        Console.Write(input.ToString());
+                        ClearCurrentLine(promptLength);
+                        Write("> " + input.ToString());
                         // Move cursor back to current position
                         if (currentIndex < input.Length)
                         {
-                            Console.SetCursorPosition(currentIndex, Console.CursorTop);
+                            Console.SetCursorPosition(promptLength + currentIndex, Console.CursorTop);
                         }
                     }
                 }
@@ -143,23 +144,23 @@ namespace command_box
 
                     input.Insert(currentIndex, key.KeyChar);
                     currentIndex++;
-                    ClearCurrentLine();
-                    Console.Write(input.ToString());
+                    ClearCurrentLine(promptLength);
+                    Write("> " + input.ToString());
+
                     // Move cursor back to current position
                     if (currentIndex < input.Length)
                     {
-                        Console.SetCursorPosition(currentIndex, Console.CursorTop);
+                        Console.SetCursorPosition(promptLength + currentIndex, Console.CursorTop);
                     }
                 }
             }
         }
 
-        private static void ClearCurrentLine()
+        private static void ClearCurrentLine(int promptLength = 0)
         {
-            int currentLeft = Console.CursorLeft;
             int currentTop = Console.CursorTop;
             Console.SetCursorPosition(0, currentTop);
-            Console.Write(new string(' ', Console.WindowWidth - 1));
+            Write(new string(' ', Console.WindowWidth - 1));
             Console.SetCursorPosition(0, currentTop);
         }
     }
