@@ -11,7 +11,7 @@ namespace command_box
     public class Commands : Collection<Command>
     {
 
-        public Commands() { }   
+        public Commands() { }
 
         public void LoadCommandsFromDirectory(string directoryPath)
         {
@@ -24,12 +24,12 @@ namespace command_box
             foreach (string file in Directory.GetFiles(directoryPath))
             {
                 string ext = Path.GetExtension(file).ToLower();
-                
+
                 Console.WriteLine($"Loading commands: {ext}");
 
                 CommandType type;
                 switch (ext)
-                { 
+                {
                     case ".bat":
                         type = CommandType.Batch;
                         break;
@@ -55,22 +55,25 @@ namespace command_box
             }
         }
 
-    private static Dictionary<string, string> ParseMetadata(string path)
-    {
-        var meta = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var line in File.ReadLines(path).Take(20))
+        private static Dictionary<string, string> ParseMetadata(string path)
         {
-            var trimmed = line.TrimStart('#', '@', 'r', 'e', 'm', ' ');
-            if (!trimmed.StartsWith("meta")) continue;
+            var meta = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var line in File.ReadLines(path).Take(20))
+            {
+                if (!line.Contains("@meta", StringComparison.OrdinalIgnoreCase))
+                    continue;
 
-            var parts = trimmed.Substring(4).Trim().Split('=', 2);
-            if (parts.Length == 2)
-                meta[parts[0].Trim()] = parts[1].Trim();
+                // Extract the part after @meta
+                var metaIndex = line.IndexOf("@meta", StringComparison.OrdinalIgnoreCase);
+                if (metaIndex == -1) continue;
+
+                var afterMeta = line.Substring(metaIndex + 5).Trim(); // +5 for "@meta"
+                var parts = afterMeta.Split('=', 2);
+
+                if (parts.Length == 2)
+                    meta[parts[0].Trim()] = parts[1].Trim();
+            }
+            return meta;
         }
-
-        return meta;
-    }
-
     }
 }
