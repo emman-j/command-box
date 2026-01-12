@@ -12,7 +12,6 @@ namespace command_box
         private WriteLineDelegate _writeLine;
         private Process _process;
         private bool _isRunning = false;
-        public delegate void WriteLineDelegate(string message);
 
         public string LastOutput { get; private set; }
 
