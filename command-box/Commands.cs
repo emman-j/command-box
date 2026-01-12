@@ -18,10 +18,15 @@ namespace command_box
             if(!Directory.Exists(directoryPath))
                 throw new DirectoryNotFoundException($"The scripts directory '{directoryPath}' does not exist.");
 
+
+            Console.WriteLine($"Loading commands from directory...");
+
             foreach (string file in Directory.GetFiles(directoryPath))
             {
                 string ext = Path.GetExtension(file).ToLower();
                 
+                Console.WriteLine($"Loading commands: {ext}");
+
                 CommandType type;
                 switch (ext)
                 { 
