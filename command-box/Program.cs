@@ -8,13 +8,8 @@ namespace command_box
         {
             CommandsManager commandsManager = new CommandsManager();
 
-            bool running = true;
-
-            while (running)
+            while (true)
             { 
-                if(!running)
-                    break;
-
                 if (args.Length == 0)
                 {
                     string input = ReadLineWithAutoComplete(commandsManager.Commands);
@@ -36,8 +31,7 @@ namespace command_box
                     case "exit":
                     case "quit":
                     case "-q":
-                        running = false;
-                        continue;
+                        return;
                 }
 
                 string[] commandArgs = args.Skip(1).ToArray();
