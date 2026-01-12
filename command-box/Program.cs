@@ -71,6 +71,9 @@ namespace command_box
                         .OrderBy(c => c.Name)
                         .ToList();
 
+                    if(matches.Count == 0)
+                        continue;
+
                     ClearCurrentLine();
                     input.Clear();
                     if (matches.Count == 1)
@@ -94,6 +97,8 @@ namespace command_box
                 }
                 else if (key.Key == ConsoleKey.Backspace)
                 {
+                    lastmatchInput = string.Empty;
+
                     if (input.Length > 0 && currentIndex > 0)
                     {
                         input.Remove(currentIndex - 1, 1);
@@ -109,6 +114,8 @@ namespace command_box
                 }
                 else if (key.Key == ConsoleKey.LeftArrow)
                 {
+                    lastmatchInput = string.Empty;
+
                     if (currentIndex > 0)
                     {
                         currentIndex--;
@@ -117,6 +124,8 @@ namespace command_box
                 }
                 else if (key.Key == ConsoleKey.RightArrow)
                 {
+                    lastmatchInput = string.Empty;
+
                     if (currentIndex < input.Length)
                     {
                         currentIndex++;
@@ -125,6 +134,8 @@ namespace command_box
                 }
                 else if (!char.IsControl(key.KeyChar))
                 {
+                    lastmatchInput = string.Empty;
+
                     input.Insert(currentIndex, key.KeyChar);
                     currentIndex++;
                     ClearCurrentLine();
