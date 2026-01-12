@@ -39,7 +39,14 @@ namespace command_box
                 args = Array.Empty<string>();
             }
         }
-
+        private static void WriteLine(string message = "")
+        {
+            Console.WriteLine("> " + message);
+        }
+        private static void Write(string message = "")
+        {
+            Console.Write(message);
+        }
         private static string ReadLineWithAutoComplete(Commands commands)
         {
             StringBuilder input = new StringBuilder();
