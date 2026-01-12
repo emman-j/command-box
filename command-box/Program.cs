@@ -46,6 +46,8 @@ namespace command_box
         {
             StringBuilder input = new StringBuilder();
             int currentIndex = 0;
+            int matchIndex = 0;
+            string lastmatchInput = string.Empty;
 
             while (true)
             {
@@ -58,32 +60,37 @@ namespace command_box
                 }
                 else if (key.Key == ConsoleKey.Tab)
                 {
-                    string currentInput = input.ToString();
+                    string currentInput = string.IsNullOrWhiteSpace(lastmatchInput) ? input.ToString() : lastmatchInput;
+
+                    if (string.IsNullOrWhiteSpace(lastmatchInput))
+                        lastmatchInput = currentInput;
+
+
                     var matches = commands
                         .Where(c => c.Name.StartsWith(currentInput, StringComparison.OrdinalIgnoreCase))
                         .OrderBy(c => c.Name)
                         .ToList();
 
+                    ClearCurrentLine();
+                    input.Clear();
                     if (matches.Count == 1)
                     {
                         // Single match - auto-complete
-                        ClearCurrentLine();
-                        input.Clear();
                         input.Append(matches[0].Name);
-                        Console.Write(input.ToString());
                         currentIndex = input.Length;
                     }
                     else if (matches.Count > 1)
                     {
                         // Multiple matches - show options
-                        Console.WriteLine();
-                        Console.WriteLine("Possible completions:");
-                        foreach (var match in matches)
-                        {
-                            Console.WriteLine($"  {match.Name} - {match.Description}");
-                        }
-                        Console.Write(input.ToString());
+
+                        if (matchIndex >= matches.Count)
+                            matchIndex = 0;
+
+                        input.Append(matches[matchIndex].Name);
+                        currentIndex = input.Length;
+                        matchIndex++;
                     }
+                    Console.Write(input.ToString());
                 }
                 else if (key.Key == ConsoleKey.Backspace)
                 {
