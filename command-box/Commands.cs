@@ -10,8 +10,14 @@ namespace command_box
 {
     public class Commands : Collection<Command>
     {
+        public WriteLineDelegate WriteLine { get; set; }
 
-        public Commands() { }
+        public Commands(WriteLineDelegate writeLine = null)
+        {
+            if (writeLine == null)
+                WriteLine = Console.WriteLine;
+            WriteLine = writeLine;
+        }
 
         public void LoadCommandsFromDirectory(string directoryPath)
         {
@@ -19,14 +25,14 @@ namespace command_box
                 throw new DirectoryNotFoundException($"The scripts directory '{directoryPath}' does not exist.");
 
 
-            Console.WriteLine($"Loading commands from directory...");
+            WriteLine($"Loading commands from directory...");
 
             foreach (string file in Directory.GetFiles(directoryPath))
             {
                 string name = Path.GetFileNameWithoutExtension(file);
                 string ext = Path.GetExtension(file).ToLower();
 
-                Console.WriteLine($" - {name}");
+                WriteLine($" - {name}");
 
                 CommandType type;
                 switch (ext)
