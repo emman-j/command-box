@@ -23,9 +23,10 @@ namespace command_box
 
             foreach (string file in Directory.GetFiles(directoryPath))
             {
+                string name = Path.GetFileNameWithoutExtension(file);
                 string ext = Path.GetExtension(file).ToLower();
 
-                Console.WriteLine($"Loading commands: {ext}");
+                Console.WriteLine($" - {name}");
 
                 CommandType type;
                 switch (ext)
@@ -43,7 +44,6 @@ namespace command_box
                         continue;
                 }
 
-                string name = Path.GetFileNameWithoutExtension(file);
                 var metadata = ParseMetadata(file);
                 this.Add(new Command(
                     name,
