@@ -4,8 +4,7 @@ namespace command_box
 {
     internal class Program
     {
-
-        static void Main()
+        static void Main(string[] args)
         {
             CommandsManager commandsManager = new CommandsManager();
 
@@ -16,12 +15,16 @@ namespace command_box
                 if(!running)
                     break;
 
-                string input = ReadLineWithAutoComplete(commandsManager.Commands);
+                if (args.Length == 0)
+                {
+                    string input = ReadLineWithAutoComplete(commandsManager.Commands);
 
-                if (string.IsNullOrWhiteSpace(input))
-                    continue;
+                    if (string.IsNullOrWhiteSpace(input))
+                        continue;
 
-                string[] args = input.Split(' ');
+                    args = input.Split(' ');
+                }
+
                 string command = args[0];
 
                 switch (command.ToLower())
@@ -39,6 +42,7 @@ namespace command_box
 
                 string[] commandArgs = args.Skip(1).ToArray();
                 commandsManager.ExecuteCommand(command, commandArgs);
+                args = Array.Empty<string>();
             }
         }
 
