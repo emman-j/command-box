@@ -1,10 +1,5 @@
-﻿using command_box.Enums;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using command_box.Enums;
 
 namespace command_box
 {
@@ -27,7 +22,7 @@ namespace command_box
             Type = type;
         }
 
-        public string Execute(string[] args)
+        public void Execute(string[] args)
         {
             ProcessStartInfo psi = new ProcessStartInfo();
             string argString = string.Join(" ", args);
@@ -43,26 +38,21 @@ namespace command_box
                     psi.Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{CommandPath}\" {argString}";
                     break;
                 case CommandType.Python:
-                    psi.FileName = "python"; // Assumes python is in PATH
+                    psi.FileName = "python";
                     psi.Arguments = $"\"{CommandPath}\" {argString}";
                     break;
             }
 
-            psi.RedirectStandardOutput = true;
-            psi.RedirectStandardError = true;
+            psi.RedirectStandardOutput = false; // Let output go directly to console
+            psi.RedirectStandardError = false;  // Let errors go directly to console
+            psi.RedirectStandardInput = false;  // Let input come directly from console
             psi.UseShellExecute = false;
-            psi.CreateNoWindow = true;
+            psi.CreateNoWindow = false;         // Show in same console window
 
-            using Process process = Process.Start(psi);
-            process.WaitForExit();
-
-            string output = process.StandardOutput.ReadToEnd();
-            string error = process.StandardError.ReadToEnd();
-
-            if (!string.IsNullOrEmpty(error))
-                output += Environment.NewLine + error;
-
-            return output.Trim();
+            using (Process process = Process.Start(psi))
+            {
+                process.WaitForExit();
+            }
         }
     }
 }
