@@ -64,13 +64,12 @@ namespace command_box
             {
                 ConsoleKeyInfo key = Console.ReadKey(intercept: true);
 
-                if (key.Key == ConsoleKey.Enter)
+                switch (key.Key)
                 {
+                    case ConsoleKey.Enter:
                     Console.WriteLine();
                     return input.ToString();
-                }
-                else if (key.Key == ConsoleKey.Tab)
-                {
+                    case ConsoleKey.Tab:
                     string currentInput = string.IsNullOrWhiteSpace(lastmatchInput) ? input.ToString() : lastmatchInput;
 
                     if (string.IsNullOrWhiteSpace(lastmatchInput))
@@ -104,9 +103,8 @@ namespace command_box
                         matchIndex++;
                     }
                     Write("> " + input.ToString());
-                }
-                else if (key.Key == ConsoleKey.Backspace)
-                {
+                        continue;
+                    case ConsoleKey.Backspace:
                     lastmatchInput = string.Empty;
 
                     if (input.Length > 0 && currentIndex > 0)
@@ -121,9 +119,8 @@ namespace command_box
                             Console.SetCursorPosition(promptLength + currentIndex, Console.CursorTop);
                         }
                     }
-                }
-                else if (key.Key == ConsoleKey.LeftArrow)
-                {
+                        continue;
+                    case ConsoleKey.LeftArrow:
                     lastmatchInput = string.Empty;
 
                     if (currentIndex > 0)
@@ -131,9 +128,8 @@ namespace command_box
                         currentIndex--;
                         Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
                     }
-                }
-                else if (key.Key == ConsoleKey.RightArrow)
-                {
+                        continue;
+                    case ConsoleKey.RightArrow:
                     lastmatchInput = string.Empty;
 
                     if (currentIndex < input.Length)
@@ -141,9 +137,8 @@ namespace command_box
                         currentIndex++;
                         Console.SetCursorPosition(Console.CursorLeft + 1, Console.CursorTop);
                     }
-                }
-                else if (!char.IsControl(key.KeyChar))
-                {
+                        continue;
+                    default:
                     lastmatchInput = string.Empty;
 
                     input.Insert(currentIndex, key.KeyChar);
@@ -156,6 +151,7 @@ namespace command_box
                     {
                         Console.SetCursorPosition(promptLength + currentIndex, Console.CursorTop);
                     }
+                        continue;
                 }
             }
         }
