@@ -18,6 +18,7 @@ namespace command_box
             {"Console Logs Directory", Paths.ConsoleLogsDir }
         };
         public Commands Commands { get; private set; }
+        public List<string> CommandsHistory { get;  set; }
         public WriteLineDelegate WriteLine { get; set; }
         public CommandsManager(WriteLineDelegate writeLine = null)
         {
@@ -45,10 +46,10 @@ namespace command_box
             Commands = new Commands(WriteLine);
             if (!File.Exists(Paths.Cache))
             {
-            Commands.LoadCommandsFromDirectory(Paths.ScriptsDir);
+                Commands.LoadCommandsFromDirectory(Paths.ScriptsDir);
                 Commands.SaveCache(Paths.Cache);
                 return;
-        }
+            }
             Commands.LoadCache(Paths.Cache);
         }
         public void ExecuteCommand(string commandName, string[] args)
