@@ -33,6 +33,15 @@ namespace command_box
                         commandsManager.ShowDirectories();
                         args = Array.Empty<string>();
                         continue;
+                    case "cache":
+                        commandsManager.Cache(args.Skip(1).ToArray());
+                        args = Array.Empty<string>();
+                        continue;
+                    case "cls":
+                    case "clear":
+                        Console.Clear();
+                        args = Array.Empty<string>();
+                        continue;
                     case "exit":
                     case "quit":
                     case "-q":
