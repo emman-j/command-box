@@ -8,6 +8,7 @@ namespace command_box.Enums
 {
     public enum CommandType
     {
+        None,
         Batch,
         PowerShell,
         Shell,
