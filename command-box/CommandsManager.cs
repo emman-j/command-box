@@ -9,6 +9,14 @@ namespace command_box
 {
     public class CommandsManager
     {
+        private Dictionary<string, string> directories = new Dictionary<string, string>()
+        {
+            {"Scripts Directory", Paths.ScriptsDir },
+            {"Data Directory", Paths.DataDir },
+            {"Settings Directory", Paths.SettingsDir },
+            {"Error Logs Directory", Paths.ErrorLogsDir },
+            {"Console Logs Directory", Paths.ConsoleLogsDir }
+        };
         public Commands Commands { get; private set; }
         public WriteLineDelegate WriteLine { get; set; }
         public CommandsManager(WriteLineDelegate writeLine = null)
@@ -21,14 +29,6 @@ namespace command_box
         }
         private void EnsureAppDirectory()
         {
-            Dictionary<string, string> directories = new Dictionary<string, string>()
-            { 
-                {"Scripts Directory", Paths.ScriptsDir },
-                {"Data Directory", Paths.DataDir },
-                {"Settings Directory", Paths.SettingsDir },
-                {"Error Logs Directory", Paths.ErrorLogsDir },
-                {"Console Logs Directory", Paths.ConsoleLogsDir }
-            };
             WriteLine($"Ensuring application directories exist...");
             foreach (var kvp in directories) 
             {
