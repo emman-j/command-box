@@ -19,7 +19,7 @@ namespace command_box
         };
 
 
-        public Commands Commands { get; private set; }
+        public CommandsCollection Commands { get; private set; }
         public List<string> CommandsHistory { get; set; } = new List<string>();
         public WriteLineDelegate WriteLine { get; set; }
 
@@ -49,7 +49,7 @@ namespace command_box
         }
         private void LoadCommands()
         {
-            Commands = new Commands(WriteLine);
+            Commands = new CommandsCollection(WriteLine);
 
             InitializeInternalCommands();
 
