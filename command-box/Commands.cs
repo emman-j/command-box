@@ -14,10 +14,12 @@ namespace command_box
             WriteLine = Console.WriteLine;
         }
 
-        public Commands(WriteLineDelegate writeLine = null)
+        public Commands(IEnumerable<Command> commands) : this()
         {
-            if (writeLine == null)
-                WriteLine = Console.WriteLine;
+            AddRange(commands);
+        }
+        public Commands(WriteLineDelegate writeLine) : this() 
+        {
             WriteLine = writeLine;
         }
 
