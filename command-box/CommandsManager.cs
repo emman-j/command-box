@@ -17,9 +17,13 @@ namespace command_box
             {"Error Logs Directory", Paths.ErrorLogsDir },
             {"Console Logs Directory", Paths.ConsoleLogsDir }
         };
+
+
         public Commands Commands { get; private set; }
         public List<string> CommandsHistory { get;  set; } = new List<string>();
         public WriteLineDelegate WriteLine { get; set; }
+
+
         public CommandsManager(WriteLineDelegate writeLine = null)
         {
             if(writeLine == null)
@@ -28,6 +32,8 @@ namespace command_box
             EnsureAppDirectory();
             LoadCommands();
         }
+
+
         private void EnsureAppDirectory()
         {
             WriteLine($"Ensuring application directories exist...");
@@ -122,6 +128,9 @@ namespace command_box
                     break;
                 case "clear":
                     Commands.ClearCache(Paths.Cache);
+                    break;
+                case "refresh":
+                    Commands.RefreshCache(Paths.ScriptsDir, Paths.Cache);
                     break;
                 default:
                     WriteLine("Usage: cache [save|load|clear]");
