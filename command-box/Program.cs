@@ -87,7 +87,7 @@ namespace command_box
         }
         private static string ReadLineWithAutoComplete(CommandsManager commandsmanager)
         {
-            Commands commands = commandsmanager.Commands;
+            CommandsCollection commands = commandsmanager.Commands;
             StringBuilder input = new StringBuilder();
             int currentIndex = 0;
 

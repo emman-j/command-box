@@ -4,21 +4,21 @@ using System.Collections.ObjectModel;
 
 namespace command_box
 {
-    public class Commands : Collection<Command>
+    public class CommandsCollection : Collection<Command>
     {
         [JsonIgnore]
         public WriteLineDelegate WriteLine { get; set; }
 
-        public Commands()
+        public CommandsCollection()
         {
             WriteLine = Console.WriteLine;
         }
 
-        public Commands(IEnumerable<Command> commands) : this()
+        public CommandsCollection(IEnumerable<Command> commands) : this()
         {
             AddRange(commands);
         }
-        public Commands(WriteLineDelegate writeLine) : this() 
+        public CommandsCollection(WriteLineDelegate writeLine) : this() 
         {
             WriteLine = writeLine;
         }
@@ -105,7 +105,7 @@ namespace command_box
         public void SaveCache(string cachePath)
         {
             WriteLine($"Saving commands cache...");
-            Commands commands = new Commands(this.Where(command => command.Type != CommandType.Internal).OrderBy(c => c.Name));
+            CommandsCollection commands = new CommandsCollection(this.Where(command => command.Type != CommandType.Internal).OrderBy(c => c.Name));
             string json = JsonConvert.SerializeObject(commands, Formatting.Indented);
             File.WriteAllText(cachePath, json);
         }
@@ -114,12 +114,12 @@ namespace command_box
             if (!File.Exists(cachePath))
                 throw new DirectoryNotFoundException($"The scripts cache '{cachePath}' does not exist.");
 
-            Commands c = new Commands(this.Where(command => command.Type != CommandType.Internal));
+            CommandsCollection c = new CommandsCollection(this.Where(command => command.Type != CommandType.Internal));
             RemoveRange(c);
 
             WriteLine($"Loading commands from cache...");
             string json = File.ReadAllText(cachePath);
-            Commands commands = JsonConvert.DeserializeObject<Commands>(json);
+            CommandsCollection commands = JsonConvert.DeserializeObject<CommandsCollection>(json);
             AddRange(commands);
         }
         public void RefreshCache(string directoryPath, string cachePath)
@@ -131,7 +131,7 @@ namespace command_box
         }
         public void ClearCache(string cachePath)
         {
-            Commands commands = new Commands(this.Where(command => command.Type != CommandType.Internal));
+            CommandsCollection commands = new CommandsCollection(this.Where(command => command.Type != CommandType.Internal));
             RemoveRange(commands);
             if (File.Exists(cachePath))
             {
