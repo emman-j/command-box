@@ -11,6 +11,8 @@ namespace command_box
         public string Usage { get; }
         public CommandType Type { get; }
 
+        [JsonIgnore]
+        public Action<string[]> Action { get; set; }
         public override string ToString() => $"{Name}";
 
         public Command(string name, string description, string commandPath, string usage, CommandType type) 
