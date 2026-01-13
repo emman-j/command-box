@@ -65,50 +65,25 @@ namespace command_box
         }
         private void InitializeInternalCommands()
         {
-            Commands.Add(new Command(
-                "help",
-                "Show all available commands",
-                "",
-                "help",
-                Enums.CommandType.Internal
-            )
+            Commands.Add(new Command("help", "Show all available commands", "", "help", Enums.CommandType.Internal)
             {
                 Action = ShowHelp
             });
 
-            Commands.Add(new Command(
-                "dir",
-                "Show all application directories",
-                "",
-                "dir",
-                Enums.CommandType.Internal
-            )
+            Commands.Add(new Command("dir", "Show all application directories", "", "dir", Enums.CommandType.Internal)
             {
                 Action = ShowDirectories
             });
 
-            Commands.Add(new Command(
-                "cache",
-                "Manages the cache (save, load, refresh, clear).",
-                "",
-                "cache [save|load|refresh|clear]",
-                Enums.CommandType.Internal
-            )
+            Commands.Add(new Command("cache", "Manages the cache (save, load, refresh, clear).", "", "cache [save|load|refresh|clear]", Enums.CommandType.Internal)
             {
                 Action = Cache
             });
 
-            Commands.Add(new Command(
-                "history",
-                "Manages the history (save, load, clear).",
-                "",
-                "history [save|load|clear]",
-                Enums.CommandType.Internal
-            )
+            Commands.Add(new Command("history", "Manages the history (save, load, clear).", "", "history [save|load|clear]", Enums.CommandType.Internal)
             { 
                 Action = History
             });
-
         }
         public void SaveHistory()
         {
