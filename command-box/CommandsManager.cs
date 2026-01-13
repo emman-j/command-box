@@ -59,14 +59,23 @@ namespace command_box
         }
         public void ShowHelp()
         {
-            WriteLine("Available Commands:");
+            WriteLine();
+            WriteLine("-------------------------------------------------------");
+            WriteLine("Available Commands");
+            WriteLine("-------------------------------------------------------");
+
+            int maxNameLength = Commands.Max(c => c.Name.Length);
+
             foreach (var command in Commands)
             {
-                WriteLine(command.ToString());
-                WriteLine($"Description: {command.Description}");
-                WriteLine($"Usage: {command.Usage}");
-                WriteLine();
+                string paddedName = command.Name.PadRight(maxNameLength);
+                WriteLine($"{paddedName} : {command.Description}");
+
+                string indent = new string(' ', maxNameLength);
+                WriteLine($"{indent} : {command.Usage}");
             }
+
+            WriteLine("-------------------------------------------------------");
         }
     }
 }
