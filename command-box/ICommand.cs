@@ -14,6 +14,6 @@ namespace command_box
         string CommandPath { get; }
         string Usage { get; }
         CommandType Type { get; }
-        string Execute(string[] args);
+        void Execute(string[] args);
     }
 }
