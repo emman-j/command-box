@@ -50,7 +50,6 @@ namespace command_box
 
                 string[] commandArgs = args.Skip(1).ToArray();
                 commandsManager.ExecuteCommand(command, commandArgs);
-                commandsManager.CommandsHistory.Add(string.Join(' ', args));
                 args = Array.Empty<string>();
             }
         }
@@ -86,6 +85,11 @@ namespace command_box
                 {
                     case ConsoleKey.Enter:
                         Console.WriteLine();
+
+                        // Only add non-empty inputs to history
+                        if (!string.IsNullOrWhiteSpace(input.ToString()))
+                            commandsmanager.CommandsHistory.Add(input.ToString());
+
                         return input.ToString();
                     case ConsoleKey.Tab:
                         string currentInput = string.IsNullOrWhiteSpace(lastmatchInput) ? input.ToString() : lastmatchInput;
