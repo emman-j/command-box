@@ -1,16 +1,12 @@
 ﻿using command_box.Enums;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace command_box
 {
     public class Commands : Collection<Command>
     {
+        [JsonIgnore]
         public WriteLineDelegate WriteLine { get; set; }
 
         public Commands()
@@ -114,13 +110,16 @@ namespace command_box
                 }
 
                 var metadata = ParseMetadata(file);
-                this.Add(new Command(
+
+                Command command = new Command(
                     name,
                     metadata["description"],
                     file,
                     metadata["usage"],
                     type
-                ));
+                );
+
+                this.Add(command);
             }
         }
 

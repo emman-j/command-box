@@ -67,7 +67,7 @@ namespace command_box
                 return;
             }
             WriteLine($"Executing command: {command.Name}");
-            WriteLine(command.Execute(args));
+            command.Execute(args);
         }
         public void ShowDirectories()
         {
