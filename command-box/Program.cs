@@ -29,6 +29,9 @@ namespace command_box
                     args = input.Split(' ');
                 }
 
+                if (!string.IsNullOrWhiteSpace(string.Join(' ', args)))
+                    commandsManager.CommandsHistory.Add(string.Join(' ', args));
+
                 string command = args[0];
 
                 switch (command.ToLower())
@@ -119,11 +122,6 @@ namespace command_box
                 {
                     case ConsoleKey.Enter:
                         Console.WriteLine();
-
-                        // Only add non-empty inputs to history
-                        if (!string.IsNullOrWhiteSpace(input.ToString()))
-                            commandsmanager.CommandsHistory.Add(input.ToString());
-
                         return input.ToString();
                     case ConsoleKey.Tab:
                         string currentInput = string.IsNullOrWhiteSpace(lastmatchInput) ? input.ToString() : lastmatchInput;
