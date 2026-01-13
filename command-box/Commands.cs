@@ -45,7 +45,20 @@ namespace command_box
             string json = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(cachePath, json);
         }
+        public void LoadCache(string cachePath)
+        {
+            if (!File.Exists(cachePath))
+                throw new DirectoryNotFoundException($"The scripts cache '{cachePath}' does not exist.");
 
+            WriteLine($"Loading commands from cache...");
+            string json = File.ReadAllText(cachePath);
+            Commands commands = JsonConvert.DeserializeObject<Commands>(json);
+
+            foreach (var command in commands)
+            {
+                this.Add(command);
+            }
+        }
         public void LoadCommandsFromDirectory(string directoryPath)
         {
             if(!Directory.Exists(directoryPath))
