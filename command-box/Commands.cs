@@ -22,7 +22,7 @@ namespace command_box
         {
             WriteLine = writeLine;
         }
-
+        
         private static Dictionary<string, string> ParseMetadata(string path)
         {
             var meta = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -61,35 +61,34 @@ namespace command_box
         public void SaveCache(string cachePath)
         {
             WriteLine($"Saving commands cache...");
-            string json = JsonConvert.SerializeObject(this, Formatting.Indented);
+            Commands commands = new Commands(this.Where(command => command.Type != CommandType.None).OrderBy(c => c.Name));
+            string json = JsonConvert.SerializeObject(commands, Formatting.Indented);
             File.WriteAllText(cachePath, json);
         }
         public void LoadCache(string cachePath)
         {
             if (!File.Exists(cachePath))
                 throw new DirectoryNotFoundException($"The scripts cache '{cachePath}' does not exist.");
-            
-            this.Clear();
+
+            Commands c = new Commands(this.Where(command => command.Type != CommandType.None));
+            RemoveRange(c);
 
             WriteLine($"Loading commands from cache...");
             string json = File.ReadAllText(cachePath);
             Commands commands = JsonConvert.DeserializeObject<Commands>(json);
-
-            foreach (var command in commands)
-            {
-                this.Add(command);
-            }
+            AddRange(commands);
         }
         public void RefreshCache(string directoryPath, string cachePath)
         {
-            this.Clear();
-
             WriteLine($"Refeshing cache...");
+            ClearCache(cachePath);
             LoadCommandsFromDirectory(directoryPath);
             SaveCache(cachePath);
         }
         public void ClearCache(string cachePath)
         {
+            Commands commands = new Commands(this.Where(command => command.Type != CommandType.None));
+            RemoveRange(commands);
             if (File.Exists(cachePath))
             {
                 WriteLine($"Clearing commands cache...");
