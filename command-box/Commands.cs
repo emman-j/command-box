@@ -43,6 +43,21 @@ namespace command_box
             }
             return meta;
         }
+        public void AddRange(IEnumerable<Command> commands)
+        {
+            foreach (var command in commands)
+            {
+                this.Add(command);
+            }
+        }
+
+        public void RemoveRange(IEnumerable<Command> commands)
+        {
+            foreach (var command in commands)
+            {
+                this.Remove(command);
+            }
+        }
         public void SaveCache(string cachePath)
         {
             WriteLine($"Saving commands cache...");
