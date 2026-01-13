@@ -70,7 +70,7 @@ namespace command_box
                 "Show all available commands",
                 "",
                 "help",
-                Enums.CommandType.None
+                Enums.CommandType.Internal
             )
             {
                 Action = ShowHelp
@@ -81,7 +81,7 @@ namespace command_box
                 "Show all application directories",
                 "",
                 "dir",
-                Enums.CommandType.None
+                Enums.CommandType.Internal
             )
             {
                 Action = ShowDirectories
@@ -92,7 +92,7 @@ namespace command_box
                 "Manages the cache (save, load, refresh, clear).",
                 "",
                 "cache [save|load|refresh|clear]",
-                Enums.CommandType.None
+                Enums.CommandType.Internal
             )
             {
                 Action = Cache
@@ -103,7 +103,7 @@ namespace command_box
                 "Manages the history (save, load, clear).",
                 "",
                 "history [save|load|clear]",
-                Enums.CommandType.None
+                Enums.CommandType.Internal
             )
             { 
                 Action = History

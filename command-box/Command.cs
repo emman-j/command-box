@@ -29,7 +29,7 @@ namespace command_box
         {
             switch (Type)
             { 
-                case CommandType.None:
+                case CommandType.Internal:
                     Action?.Invoke(args);
                     break;
                 default:
