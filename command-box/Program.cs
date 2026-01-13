@@ -36,23 +36,6 @@ namespace command_box
 
                 switch (command.ToLower())
                 {
-                    case "-h":
-                    case "help":
-                        commandsManager.ShowHelp();
-                        args = Array.Empty<string>();
-                        continue;
-                    case "dir":
-                        commandsManager.ShowDirectories();
-                        args = Array.Empty<string>();
-                        continue;
-                    case "cache":
-                        commandsManager.Cache(args.Skip(1).ToArray());
-                        args = Array.Empty<string>();
-                        continue;
-                    case "history":
-                        commandsManager.History(args.Skip(1).ToArray());
-                        args = Array.Empty<string>();
-                        continue;
                     case "cls":
                     case "clear":
                         Console.Clear();

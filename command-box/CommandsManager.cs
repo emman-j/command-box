@@ -50,12 +50,16 @@ namespace command_box
         private void LoadCommands()
         {
             Commands = new Commands(WriteLine);
+
+            InitializeInternalCommands();
+
             if (!File.Exists(Paths.Cache))
             {
                 Commands.LoadCommandsFromDirectory(Paths.ScriptsDir);
                 Commands.SaveCache(Paths.Cache);
                 return;
             }
+
             Commands.LoadCache(Paths.Cache);
             LoadHistory();
         }
