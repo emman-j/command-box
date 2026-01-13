@@ -19,6 +19,27 @@ namespace command_box
             WriteLine = writeLine;
         }
 
+        private static Dictionary<string, string> ParseMetadata(string path)
+        {
+            var meta = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var line in File.ReadLines(path).Take(20))
+            {
+                if (!line.Contains("@meta", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                // Extract the part after @meta
+                var metaIndex = line.IndexOf("@meta", StringComparison.OrdinalIgnoreCase);
+                if (metaIndex == -1) continue;
+
+                var afterMeta = line.Substring(metaIndex + 5).Trim(); // +5 for "@meta"
+                var parts = afterMeta.Split('=', 2);
+
+                if (parts.Length == 2)
+                    meta[parts[0].Trim()] = parts[1].Trim();
+            }
+            return meta;
+        }
+
         public void LoadCommandsFromDirectory(string directoryPath)
         {
             if(!Directory.Exists(directoryPath))
@@ -61,25 +82,5 @@ namespace command_box
             }
         }
 
-        private static Dictionary<string, string> ParseMetadata(string path)
-        {
-            var meta = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var line in File.ReadLines(path).Take(20))
-            {
-                if (!line.Contains("@meta", StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                // Extract the part after @meta
-                var metaIndex = line.IndexOf("@meta", StringComparison.OrdinalIgnoreCase);
-                if (metaIndex == -1) continue;
-
-                var afterMeta = line.Substring(metaIndex + 5).Trim(); // +5 for "@meta"
-                var parts = afterMeta.Split('=', 2);
-
-                if (parts.Length == 2)
-                    meta[parts[0].Trim()] = parts[1].Trim();
-            }
-            return meta;
-        }
     }
 }
