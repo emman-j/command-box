@@ -14,13 +14,15 @@ namespace command_box
             WriteLine = Console.WriteLine;
         }
 
-        public Commands(WriteLineDelegate writeLine = null)
+        public Commands(IEnumerable<Command> commands) : this()
         {
-            if (writeLine == null)
-                WriteLine = Console.WriteLine;
+            AddRange(commands);
+        }
+        public Commands(WriteLineDelegate writeLine) : this() 
+        {
             WriteLine = writeLine;
         }
-
+        
         private static Dictionary<string, string> ParseMetadata(string path)
         {
             var meta = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -41,44 +43,22 @@ namespace command_box
             }
             return meta;
         }
-        public void SaveCache(string cachePath)
-        {
-            WriteLine($"Saving commands cache...");
-            string json = JsonConvert.SerializeObject(this, Formatting.Indented);
-            File.WriteAllText(cachePath, json);
-        }
-        public void LoadCache(string cachePath)
-        {
-            if (!File.Exists(cachePath))
-                throw new DirectoryNotFoundException($"The scripts cache '{cachePath}' does not exist.");
-            
-            this.Clear();
 
-            WriteLine($"Loading commands from cache...");
-            string json = File.ReadAllText(cachePath);
-            Commands commands = JsonConvert.DeserializeObject<Commands>(json);
-
+        public void AddRange(IEnumerable<Command> commands)
+        {
             foreach (var command in commands)
             {
                 this.Add(command);
             }
         }
-        public void RefreshCache(string directoryPath, string cachePath)
+        public void RemoveRange(IEnumerable<Command> commands)
         {
-            this.Clear();
-
-            WriteLine($"Refeshing cache...");
-            LoadCommandsFromDirectory(directoryPath);
-            SaveCache(cachePath);
-        }
-        public void ClearCache(string cachePath)
-        {
-            if (File.Exists(cachePath))
+            foreach (var command in commands)
             {
-                WriteLine($"Clearing commands cache...");
-                File.Delete(cachePath);
+                this.Remove(command);
             }
         }
+
         public void LoadCommandsFromDirectory(string directoryPath)
         {
             if(!Directory.Exists(directoryPath))
@@ -122,6 +102,42 @@ namespace command_box
                 this.Add(command);
             }
         }
+        public void SaveCache(string cachePath)
+        {
+            WriteLine($"Saving commands cache...");
+            Commands commands = new Commands(this.Where(command => command.Type != CommandType.Internal).OrderBy(c => c.Name));
+            string json = JsonConvert.SerializeObject(commands, Formatting.Indented);
+            File.WriteAllText(cachePath, json);
+        }
+        public void LoadCache(string cachePath)
+        {
+            if (!File.Exists(cachePath))
+                throw new DirectoryNotFoundException($"The scripts cache '{cachePath}' does not exist.");
 
+            Commands c = new Commands(this.Where(command => command.Type != CommandType.Internal));
+            RemoveRange(c);
+
+            WriteLine($"Loading commands from cache...");
+            string json = File.ReadAllText(cachePath);
+            Commands commands = JsonConvert.DeserializeObject<Commands>(json);
+            AddRange(commands);
+        }
+        public void RefreshCache(string directoryPath, string cachePath)
+        {
+            WriteLine($"Refeshing cache...");
+            ClearCache(cachePath);
+            LoadCommandsFromDirectory(directoryPath);
+            SaveCache(cachePath);
+        }
+        public void ClearCache(string cachePath)
+        {
+            Commands commands = new Commands(this.Where(command => command.Type != CommandType.Internal));
+            RemoveRange(commands);
+            if (File.Exists(cachePath))
+            {
+                WriteLine($"Clearing commands cache...");
+                File.Delete(cachePath);
+            }
+        }
     }
 }

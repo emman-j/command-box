@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using command_box.Enums;
+using Newtonsoft.Json;
 
 namespace command_box
 {
@@ -10,7 +11,9 @@ namespace command_box
         public string CommandPath { get; }
         public string Usage { get; }
         public CommandType Type { get; }
-
+        
+        [JsonIgnore]
+        public Action<string[]> Action { get; set; }
         public override string ToString() => $"{Name}";
 
         public Command(string name, string description, string commandPath, string usage, CommandType type) 
@@ -23,6 +26,19 @@ namespace command_box
         }
 
         public void Execute(string[] args)
+        {
+            switch (Type)
+            { 
+                case CommandType.Internal:
+                    Action?.Invoke(args);
+                    break;
+                default:
+                    RunProcess(args);
+                    break;
+            }
+        }
+
+        private void RunProcess(string[] args)
         {
             ProcessStartInfo psi = new ProcessStartInfo();
             string argString = string.Join(" ", args);

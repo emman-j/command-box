@@ -50,22 +50,47 @@ namespace command_box
         private void LoadCommands()
         {
             Commands = new Commands(WriteLine);
+
+            InitializeInternalCommands();
+
             if (!File.Exists(Paths.Cache))
             {
                 Commands.LoadCommandsFromDirectory(Paths.ScriptsDir);
                 Commands.SaveCache(Paths.Cache);
                 return;
             }
+
             Commands.LoadCache(Paths.Cache);
             LoadHistory();
         }
+        private void InitializeInternalCommands()
+        {
+            Commands.Add(new Command("help", "Show all available commands", "", "help", Enums.CommandType.Internal)
+            {
+                Action = ShowHelp
+            });
 
+            Commands.Add(new Command("dir", "Show all application directories", "", "dir", Enums.CommandType.Internal)
+            {
+                Action = ShowDirectories
+            });
+
+            Commands.Add(new Command("cache", "Manages the cache (save, load, refresh, clear).", "", "cache [save|load|refresh|clear]", Enums.CommandType.Internal)
+            {
+                Action = Cache
+            });
+
+            Commands.Add(new Command("history", "Manages the history (save, load, clear).", "", "history [save|load|clear]", Enums.CommandType.Internal)
+            { 
+                Action = History
+            });
+        }
         public void SaveHistory()
         {
             WriteLine("Saving command history...");
             File.WriteAllLines(Paths.History, CommandsHistory);
         }
-        public void LoadHistory()
+        private void LoadHistory()
         {
             if (!File.Exists(Paths.History))
                 return;
@@ -74,7 +99,7 @@ namespace command_box
             CommandsHistory.Clear();
             CommandsHistory.AddRange(historyLines);
         }
-        public void ClearHistory()
+        private void ClearHistory()
         {
             WriteLine("Clearing command history...");
             CommandsHistory.Clear();
@@ -94,7 +119,7 @@ namespace command_box
             command.Execute(args);
         }
 
-        public void ShowDirectories()
+        public void ShowDirectories(string[] args)
         {
             WriteLine();
             WriteLine("-------------------------------------------------------");
@@ -114,7 +139,7 @@ namespace command_box
 
             WriteLine("-------------------------------------------------------");
         }
-        public void ShowHelp()
+        public void ShowHelp(string[] args)
         {
             WriteLine();
             WriteLine("-------------------------------------------------------");
@@ -135,7 +160,7 @@ namespace command_box
             WriteLine("-------------------------------------------------------");
         }
 
-        public void Cache(string[] args)
+        private void Cache(string[] args)
         {
             if (args.Length == 0)
             {
@@ -162,8 +187,7 @@ namespace command_box
                     break;
             }
         }
-
-        public void History(string[] args)
+        private void History(string[] args)
         {
             if (args.Length == 0)
             {
