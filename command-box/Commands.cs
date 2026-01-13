@@ -55,7 +55,7 @@ namespace command_box
         {
             if (!File.Exists(cachePath))
                 throw new DirectoryNotFoundException($"The scripts cache '{cachePath}' does not exist.");
-
+            
             this.Clear();
 
             WriteLine($"Loading commands from cache...");
@@ -66,6 +66,14 @@ namespace command_box
             {
                 this.Add(command);
             }
+        }
+        public void RefreshCache(string directoryPath, string cachePath)
+        {
+            this.Clear();
+
+            WriteLine($"Refeshing cache...");
+            LoadCommandsFromDirectory(directoryPath);
+            SaveCache(cachePath);
         }
         public void ClearCache(string cachePath)
         {
@@ -79,7 +87,6 @@ namespace command_box
         {
             if(!Directory.Exists(directoryPath))
                 throw new DirectoryNotFoundException($"The scripts directory '{directoryPath}' does not exist.");
-
 
             WriteLine($"Loading commands from directory...");
 
