@@ -57,6 +57,26 @@ namespace command_box
             WriteLine($"Executing command: {command.Name}");
             WriteLine(command.Execute(args));
         }
+        public void ShowDirectories()
+        {
+            WriteLine();
+            WriteLine("-------------------------------------------------------");
+            WriteLine($"Application Directory");
+            WriteLine("-------------------------------------------------------");
+
+            int maxNameLength = directories.Max(c => c.Key.Length);
+
+            foreach (var kvp in directories)
+            {
+                string dirName = kvp.Key;
+                string dirPath = kvp.Value;
+
+                string paddedName = dirName.PadRight(maxNameLength);
+                WriteLine($"{paddedName} : {dirPath}");
+            }
+
+            WriteLine("-------------------------------------------------------");
+        }
         public void ShowHelp()
         {
             WriteLine();
