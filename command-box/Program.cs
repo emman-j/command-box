@@ -6,6 +6,8 @@ namespace command_box
     {
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+
             CommandsManager commandsManager = new CommandsManager(WriteLine);
             while (true)
             { 
@@ -53,6 +55,12 @@ namespace command_box
                 args = Array.Empty<string>();
             }
         }
+
+        private static void OnProcessExit(object? sender, EventArgs e)
+        {
+
+        }
+
         private static void WriteLine(string message = "")
         {
             Console.WriteLine("> " + message);
