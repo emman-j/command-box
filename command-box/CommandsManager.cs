@@ -18,7 +18,7 @@ namespace command_box
             {"Console Logs Directory", Paths.ConsoleLogsDir }
         };
         public Commands Commands { get; private set; }
-        public List<string> CommandsHistory { get;  set; }
+        public List<string> CommandsHistory { get;  set; } = new List<string>();
         public WriteLineDelegate WriteLine { get; set; }
         public CommandsManager(WriteLineDelegate writeLine = null)
         {
