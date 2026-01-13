@@ -18,11 +18,11 @@ namespace command_box
 
         public override string ToString() => $"{Name}";
 
-        public Command(string name, string description, string path, string usage, CommandType type) 
+        public Command(string name, string description, string commandPath, string usage, CommandType type) 
         { 
             Name = name;
             Description = description;
-            CommandPath = path;
+            CommandPath = commandPath;
             Usage = usage;
             Type = type;
         }
