@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
 
 namespace command_box
 {
@@ -6,9 +7,15 @@ namespace command_box
     {
         static void Main(string[] args)
         {
-            AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+            StartupBanner();
 
             CommandsManager commandsManager = new CommandsManager(WriteLine);
+            
+            AppDomain.CurrentDomain.ProcessExit += (s,e) =>
+            {
+                commandsManager.SaveHistory();
+            };
+
             while (true)
             { 
                 if (args.Length == 0)
@@ -54,11 +61,6 @@ namespace command_box
                 commandsManager.ExecuteCommand(command, commandArgs);
                 args = Array.Empty<string>();
             }
-        }
-
-        private static void OnProcessExit(object? sender, EventArgs e)
-        {
-
         }
 
         private static void WriteLine(string message = "")
@@ -175,8 +177,8 @@ namespace command_box
                         if (currentIndex == 0)
                             continue;
 
-                            currentIndex--;
-                            Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                        currentIndex--;
+                        Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
                         continue;
                     case ConsoleKey.RightArrow:
                         lastmatchInput = string.Empty;
@@ -184,8 +186,8 @@ namespace command_box
                         if (currentIndex >= input.Length)
                             continue;
 
-                            currentIndex++;
-                            Console.SetCursorPosition(Console.CursorLeft + 1, Console.CursorTop);
+                        currentIndex++;
+                        Console.SetCursorPosition(Console.CursorLeft + 1, Console.CursorTop);
                         continue;
                     case ConsoleKey.UpArrow:
                         if (historyCount == 0)
@@ -199,12 +201,12 @@ namespace command_box
                         if (historyIndex <= 0)
                             continue;
 
-                            historyIndex--;
-                            ClearCurrentLine(promptLength);
-                            input.Clear();
-                            input.Append(commandsmanager.CommandsHistory[historyIndex]);
-                            currentIndex = input.Length;
-                            Write("> " + input.ToString());
+                        historyIndex--;
+                        ClearCurrentLine(promptLength);
+                        input.Clear();
+                        input.Append(commandsmanager.CommandsHistory[historyIndex]);
+                        currentIndex = input.Length;
+                        Write("> " + input.ToString());
                         continue;
 
                     case ConsoleKey.DownArrow:
