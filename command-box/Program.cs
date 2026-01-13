@@ -69,6 +69,26 @@ namespace command_box
         {
             Console.Write(message);
         }
+
+        private static void StartupBanner()
+        {
+            string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+            WriteLine("================================================================================================");
+            WriteLine("                                                                                                ");
+            WriteLine("  ██████╗ ██████╗ ███╗   ███╗███╗   ███╗ █████╗ ███╗   ██╗██████╗     ██████╗  ██████╗ ██╗  ██╗ ");
+            WriteLine(" ██╔════╝██╔═══██╗████╗ ████║████╗ ████║██╔══██╗████╗  ██║██╔══██╗    ██╔══██╗██╔═══██╗╚██╗██╔╝ ");
+            WriteLine(" ██║     ██║   ██║██╔████╔██║██╔████╔██║███████║██╔██╗ ██║██║  ██║    ██████╔╝██║   ██║ ╚███╔╝  ");
+            WriteLine(" ██║     ██║   ██║██║╚██╔╝██║██║╚██╔╝██║██╔══██║██║╚██╗██║██║  ██║    ██╔══██╗██║   ██║ ██╔██╗  ");
+            WriteLine(" ╚██████╗╚██████╔╝██║ ╚═╝ ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║██████╔╝    ██████╔╝╚██████╔╝██╔╝ ██╗ ");
+            WriteLine("  ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝     ╚═════╝  ╚═════╝ ╚═╝  ╚═╝ ");
+            WriteLine("                                                                                                ");
+            WriteLine($"                             Command Box - {version} alpha                                        ");
+            WriteLine("                          A simple command launcher utility                                   ");
+            WriteLine("                   ASCII art by patorjk.com | Text to ASCII Art Generator                     ");
+            WriteLine("================================================================================================");
+            WriteLine("");
+        }
         private static string ReadLineWithAutoComplete(CommandsManager commandsmanager)
         {
             Commands commands = commandsmanager.Commands;
