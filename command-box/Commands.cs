@@ -12,6 +12,11 @@ namespace command_box
     {
         public WriteLineDelegate WriteLine { get; set; }
 
+        public Commands()
+        {
+            WriteLine = Console.WriteLine;
+        }
+
         public Commands(WriteLineDelegate writeLine = null)
         {
             if (writeLine == null)
