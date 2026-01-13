@@ -43,9 +43,14 @@ namespace command_box
         private void LoadCommands()
         {
             Commands = new Commands(WriteLine);
+            if (!File.Exists(Paths.Cache))
+            {
             Commands.LoadCommandsFromDirectory(Paths.ScriptsDir);
+                Commands.SaveCache(Paths.Cache);
+                return;
         }
-
+            Commands.LoadCache(Paths.Cache);
+        }
         public void ExecuteCommand(string commandName, string[] args)
         {
             Command command = Commands.FirstOrDefault(c => c.Name.Equals(commandName, StringComparison.OrdinalIgnoreCase));
@@ -96,6 +101,31 @@ namespace command_box
             }
 
             WriteLine("-------------------------------------------------------");
+        }
+
+        public void Cache(string[] args)
+        {
+            if(args.Length == 0)
+            {
+                WriteLine("Usage: cache [save|load|clear]");
+                return;
+            }
+
+            switch (args[0])
+            { 
+                case "save":
+                    Commands.SaveCache(Paths.Cache);
+                    break;
+                case "load":
+                    Commands.LoadCache(Paths.Cache);
+                    break;
+                case "clear":
+                    Commands.ClearCache(Paths.Cache);
+                    break;
+                default:
+                    WriteLine("Usage: cache [save|load|clear]");
+                    break;
+            }
         }
     }
 }
