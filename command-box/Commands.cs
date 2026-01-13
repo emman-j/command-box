@@ -56,6 +56,8 @@ namespace command_box
             if (!File.Exists(cachePath))
                 throw new DirectoryNotFoundException($"The scripts cache '{cachePath}' does not exist.");
 
+            this.Clear();
+
             WriteLine($"Loading commands from cache...");
             string json = File.ReadAllText(cachePath);
             Commands commands = JsonConvert.DeserializeObject<Commands>(json);
