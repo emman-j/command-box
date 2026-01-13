@@ -12,11 +12,8 @@ namespace command_box
     {
         public string Name { get; }
         public string Description { get; }
-
         public string CommandPath { get; }
-
         public string Usage { get; }
-
         public CommandType Type { get; }
 
         public override string ToString() => $"{Name}";
