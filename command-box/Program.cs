@@ -49,6 +49,10 @@ namespace command_box
                         commandsManager.Cache(args.Skip(1).ToArray());
                         args = Array.Empty<string>();
                         continue;
+                    case "history":
+                        commandsManager.History(args.Skip(1).ToArray());
+                        args = Array.Empty<string>();
+                        continue;
                     case "cls":
                     case "clear":
                         Console.Clear();

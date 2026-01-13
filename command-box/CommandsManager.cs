@@ -71,6 +71,7 @@ namespace command_box
                 return;
             WriteLine("Loading command history...");
             var historyLines = File.ReadAllLines(Paths.History);
+            CommandsHistory.Clear();
             CommandsHistory.AddRange(historyLines);
         }
         public void ClearHistory()
