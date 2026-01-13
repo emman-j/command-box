@@ -20,13 +20,13 @@ namespace command_box
 
 
         public Commands Commands { get; private set; }
-        public List<string> CommandsHistory { get;  set; } = new List<string>();
+        public List<string> CommandsHistory { get; set; } = new List<string>();
         public WriteLineDelegate WriteLine { get; set; }
 
 
         public CommandsManager(WriteLineDelegate writeLine = null)
         {
-            if(writeLine == null)
+            if (writeLine == null)
                 WriteLine = Console.WriteLine;
             WriteLine = writeLine;
             EnsureAppDirectory();
@@ -37,7 +37,7 @@ namespace command_box
         private void EnsureAppDirectory()
         {
             WriteLine($"Ensuring application directories exist...");
-            foreach (var kvp in directories) 
+            foreach (var kvp in directories)
             {
                 string dirName = kvp.Key;
                 string dirPath = kvp.Value;
@@ -57,7 +57,30 @@ namespace command_box
                 return;
             }
             Commands.LoadCache(Paths.Cache);
+            LoadHistory();
         }
+
+        public void SaveHistory()
+        {
+            WriteLine("Saving command history...");
+            File.WriteAllLines(Paths.History, CommandsHistory);
+        }
+        public void LoadHistory()
+        {
+            if (!File.Exists(Paths.History))
+                return;
+            WriteLine("Loading command history...");
+            var historyLines = File.ReadAllLines(Paths.History);
+            CommandsHistory.AddRange(historyLines);
+        }
+        public void ClearHistory()
+        {
+            WriteLine("Clearing command history...");
+            CommandsHistory.Clear();
+            if (File.Exists(Paths.History))
+                File.Delete(Paths.History);
+        }
+
         public void ExecuteCommand(string commandName, string[] args)
         {
             Command command = Commands.FirstOrDefault(c => c.Name.Equals(commandName, StringComparison.OrdinalIgnoreCase));
@@ -69,6 +92,7 @@ namespace command_box
             WriteLine($"Executing command: {command.Name}");
             command.Execute(args);
         }
+
         public void ShowDirectories()
         {
             WriteLine();
@@ -112,14 +136,14 @@ namespace command_box
 
         public void Cache(string[] args)
         {
-            if(args.Length == 0)
+            if (args.Length == 0)
             {
-                WriteLine("Usage: cache [save|load|clear]");
+                WriteLine("Usage: cache [save|load|refresh|clear]");
                 return;
             }
 
             switch (args[0])
-            { 
+            {
                 case "save":
                     Commands.SaveCache(Paths.Cache);
                     break;
@@ -133,7 +157,32 @@ namespace command_box
                     Commands.RefreshCache(Paths.ScriptsDir, Paths.Cache);
                     break;
                 default:
-                    WriteLine("Usage: cache [save|load|clear]");
+                    WriteLine("Usage: cache [save|load|refresh|clear]");
+                    break;
+            }
+        }
+
+        public void History(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                WriteLine("Usage: history [save|load|clear]");
+                return;
+            }
+
+            switch (args[0])
+            {
+                case "save":
+                    SaveHistory();
+                    break;
+                case "load":
+                    LoadHistory();
+                    break;
+                case "clear":
+                    ClearHistory();
+                    break;
+                default:
+                    WriteLine("Usage: history [save|load|clear]");
                     break;
             }
         }
