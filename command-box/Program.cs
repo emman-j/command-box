@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 
 namespace command_box
 {
@@ -28,6 +27,11 @@ namespace command_box
                     case "-h":
                     case "help":
                         commandsManager.ShowHelp();
+                        args = Array.Empty<string>();
+                        continue;
+                    case "dir":
+                        commandsManager.ShowDirectories();
+                        args = Array.Empty<string>();
                         continue;
                     case "exit":
                     case "quit":
