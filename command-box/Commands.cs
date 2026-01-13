@@ -59,6 +59,14 @@ namespace command_box
                 this.Add(command);
             }
         }
+        public void ClearCache(string cachePath)
+        {
+            if (File.Exists(cachePath))
+            {
+                WriteLine($"Clearing commands cache...");
+                File.Delete(cachePath);
+            }
+        }
         public void LoadCommandsFromDirectory(string directoryPath)
         {
             if(!Directory.Exists(directoryPath))
