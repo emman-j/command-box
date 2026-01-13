@@ -74,8 +74,11 @@ namespace command_box
 
         private static void StartupBanner()
         {
+            #region ASCII Art
             string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
+            Console.WriteLine();
+            Console.WriteLine();
             WriteLine("================================================================================================");
             WriteLine("                                                                                                ");
             WriteLine("  ██████╗ ██████╗ ███╗   ███╗███╗   ███╗ █████╗ ███╗   ██╗██████╗     ██████╗  ██████╗ ██╗  ██╗ ");
@@ -90,6 +93,7 @@ namespace command_box
             WriteLine("                   ASCII art by patorjk.com | Text to ASCII Art Generator                     ");
             WriteLine("================================================================================================");
             WriteLine("");
+            #endregion
         }
         private static string ReadLineWithAutoComplete(CommandsManager commandsmanager)
         {
