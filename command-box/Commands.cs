@@ -39,6 +39,12 @@ namespace command_box
             }
             return meta;
         }
+        public void SaveCache(string cachePath)
+        {
+            WriteLine($"Saving commands cache...");
+            string json = JsonConvert.SerializeObject(this, Formatting.Indented);
+            File.WriteAllText(cachePath, json);
+        }
 
         public void LoadCommandsFromDirectory(string directoryPath)
         {
