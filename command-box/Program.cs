@@ -144,7 +144,6 @@ namespace command_box
                         else if (matches.Count > 1)
                         {
                             // Multiple matches - cycle through
-
                             if (matchIndex >= matches.Count)
                                 matchIndex = 0;
 
@@ -173,20 +172,20 @@ namespace command_box
                     case ConsoleKey.LeftArrow:
                         lastmatchInput = string.Empty;
 
-                        if (currentIndex > 0)
-                        {
+                        if (currentIndex == 0)
+                            continue;
+
                             currentIndex--;
                             Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
-                        }
                         continue;
                     case ConsoleKey.RightArrow:
                         lastmatchInput = string.Empty;
 
-                        if (currentIndex < input.Length)
-                        {
+                        if (currentIndex >= input.Length)
+                            continue;
+
                             currentIndex++;
                             Console.SetCursorPosition(Console.CursorLeft + 1, Console.CursorTop);
-                        }
                         continue;
                     case ConsoleKey.UpArrow:
                         if (historyCount == 0)
@@ -197,15 +196,15 @@ namespace command_box
                             currentEdit = input.ToString();
 
                         // Move back in history
-                        if (historyIndex > 0)
-                        {
+                        if (historyIndex <= 0)
+                            continue;
+
                             historyIndex--;
                             ClearCurrentLine(promptLength);
                             input.Clear();
                             input.Append(commandsmanager.CommandsHistory[historyIndex]);
                             currentIndex = input.Length;
                             Write("> " + input.ToString());
-                        }
                         continue;
 
                     case ConsoleKey.DownArrow:
