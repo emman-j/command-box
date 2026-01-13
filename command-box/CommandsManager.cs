@@ -59,7 +59,53 @@ namespace command_box
             Commands.LoadCache(Paths.Cache);
             LoadHistory();
         }
+        private void InitializeInternalCommands()
+        {
+            Commands.Add(new Command(
+                "help",
+                "Show all available commands",
+                "",
+                "help",
+                Enums.CommandType.None
+            )
+            {
+                Action = ShowHelp
+            });
 
+            Commands.Add(new Command(
+                "dir",
+                "Show all application directories",
+                "",
+                "dir",
+                Enums.CommandType.None
+            )
+            {
+                Action = ShowDirectories
+            });
+
+            Commands.Add(new Command(
+                "cache",
+                "Manages the cache (save, load, refresh, clear).",
+                "",
+                "cache [save|load|refresh|clear]",
+                Enums.CommandType.None
+            )
+            {
+                Action = Cache
+            });
+
+            Commands.Add(new Command(
+                "history",
+                "Manages the history (save, load, clear).",
+                "",
+                "history [save|load|clear]",
+                Enums.CommandType.None
+            )
+            { 
+                Action = History
+            });
+
+        }
         public void SaveHistory()
         {
             WriteLine("Saving command history...");
