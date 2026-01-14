@@ -118,8 +118,8 @@ namespace command_box.Commands
         public void SaveCache(string cachePath)
         {
             WriteLine($"Saving commands cache...");
-            CommandsCollection commands = new CommandsCollection(this.Where(command => command.Type != CommandType.Internal).OrderBy(c => c.Name));
-            string json = JsonConvert.SerializeObject(commands, Formatting.Indented);
+            var scriptCommands = GetAllExceptType(CommandType.Internal);
+            string json = JsonConvert.SerializeObject(scriptCommands, Formatting.Indented);
             File.WriteAllText(cachePath, json);
         }
         public void LoadCache(string cachePath)
@@ -127,7 +127,7 @@ namespace command_box.Commands
             if (!File.Exists(cachePath))
                 throw new DirectoryNotFoundException($"The scripts cache '{cachePath}' does not exist.");
 
-            CommandsCollection c = new CommandsCollection(this.Where(command => command.Type != CommandType.Internal));
+            CommandsCollection c = GetAllExceptType(CommandType.Internal);
             RemoveRange(c);
 
             WriteLine($"Loading commands from cache...");
@@ -144,7 +144,7 @@ namespace command_box.Commands
         }
         public void ClearCache(string cachePath)
         {
-            CommandsCollection commands = new CommandsCollection(this.Where(command => command.Type != CommandType.Internal));
+            CommandsCollection commands = GetAllExceptType(CommandType.Internal);
             RemoveRange(commands);
             if (File.Exists(cachePath))
             {
