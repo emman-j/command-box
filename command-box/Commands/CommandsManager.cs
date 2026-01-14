@@ -85,7 +85,7 @@ namespace command_box.Commands
         private void LoadHistory() => ExecuteCommand("history", new string[] { "load" });
         public void ExecuteCommand(string commandName, string[] args)
         {
-            Command command = Commands.FirstOrDefault(c => c.Name.Equals(commandName, StringComparison.OrdinalIgnoreCase));
+            ICommand command = Commands.GetByName(commandName);
             if (command == null)
             {
                 WriteLine($"Command '{commandName}' not found.");
