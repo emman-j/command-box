@@ -1,8 +1,9 @@
-﻿using command_box.Enums;
+﻿using System.Collections.ObjectModel;
+using command_box.Delegates;
+using command_box.Enums;
 using Newtonsoft.Json;
-using System.Collections.ObjectModel;
 
-namespace command_box
+namespace command_box.Commands
 {
     public class CommandsCollection : Collection<Command>
     {
@@ -13,7 +14,6 @@ namespace command_box
         {
             WriteLine = Console.WriteLine;
         }
-
         public CommandsCollection(IEnumerable<Command> commands) : this()
         {
             AddRange(commands);
@@ -48,14 +48,14 @@ namespace command_box
         {
             foreach (var command in commands)
             {
-                this.Add(command);
+                Add(command);
             }
         }
         public void RemoveRange(IEnumerable<Command> commands)
         {
             foreach (var command in commands)
             {
-                this.Remove(command);
+                Remove(command);
             }
         }
 
@@ -99,7 +99,7 @@ namespace command_box
                     type
                 );
 
-                this.Add(command);
+                Add(command);
             }
         }
         public void SaveCache(string cachePath)
