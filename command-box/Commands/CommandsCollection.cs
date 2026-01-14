@@ -1,11 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using command_box.Delegates;
 using command_box.Enums;
+using command_box.Interfaces;
 using Newtonsoft.Json;
 
 namespace command_box.Commands
 {
-    public class CommandsCollection : Collection<Command>
+    public class CommandsCollection : Collection<ICommand>
     {
         [JsonIgnore]
         public WriteLineDelegate WriteLine { get; set; }
@@ -14,7 +15,7 @@ namespace command_box.Commands
         {
             WriteLine = Console.WriteLine;
         }
-        public CommandsCollection(IEnumerable<Command> commands) : this()
+        public CommandsCollection(IEnumerable<ICommand> commands) : this()
         {
             AddRange(commands);
         }
@@ -44,19 +45,31 @@ namespace command_box.Commands
             return meta;
         }
 
-        public void AddRange(IEnumerable<Command> commands)
+        public void AddRange(IEnumerable<ICommand> commands)
         {
             foreach (var command in commands)
             {
                 Add(command);
             }
         }
-        public void RemoveRange(IEnumerable<Command> commands)
+        public void RemoveRange(IEnumerable<ICommand> commands)
         {
             foreach (var command in commands)
             {
                 Remove(command);
             }
+        }
+        public ICommand? GetByName(string name)
+        {
+            return this.FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+        public CommandsCollection GetByType(CommandType type)
+        {
+            return new CommandsCollection(this.Where(c => c.Type == type));
+        }
+        public CommandsCollection GetAllExceptType(CommandType type)
+        {
+            return new CommandsCollection(this.Where(c => c.Type != type));
         }
 
         public void LoadCommandsFromDirectory(string directoryPath)
@@ -105,8 +118,8 @@ namespace command_box.Commands
         public void SaveCache(string cachePath)
         {
             WriteLine($"Saving commands cache...");
-            CommandsCollection commands = new CommandsCollection(this.Where(command => command.Type != CommandType.Internal).OrderBy(c => c.Name));
-            string json = JsonConvert.SerializeObject(commands, Formatting.Indented);
+            var scriptCommands = GetAllExceptType(CommandType.Internal);
+            string json = JsonConvert.SerializeObject(scriptCommands, Formatting.Indented);
             File.WriteAllText(cachePath, json);
         }
         public void LoadCache(string cachePath)
@@ -114,13 +127,19 @@ namespace command_box.Commands
             if (!File.Exists(cachePath))
                 throw new DirectoryNotFoundException($"The scripts cache '{cachePath}' does not exist.");
 
-            CommandsCollection c = new CommandsCollection(this.Where(command => command.Type != CommandType.Internal));
+            CommandsCollection c = GetAllExceptType(CommandType.Internal);
             RemoveRange(c);
 
             WriteLine($"Loading commands from cache...");
             string json = File.ReadAllText(cachePath);
-            CommandsCollection commands = JsonConvert.DeserializeObject<CommandsCollection>(json);
-            AddRange(commands);
+
+            // Deserialize as List<Command> to avoid issues with Collection<ICommand>
+            var commands = JsonConvert.DeserializeObject<List<Command>>(json);
+
+            if (commands != null)
+            {
+                AddRange(commands);
+            }
         }
         public void RefreshCache(string directoryPath, string cachePath)
         {
@@ -131,7 +150,7 @@ namespace command_box.Commands
         }
         public void ClearCache(string cachePath)
         {
-            CommandsCollection commands = new CommandsCollection(this.Where(command => command.Type != CommandType.Internal));
+            CommandsCollection commands = GetAllExceptType(CommandType.Internal);
             RemoveRange(commands);
             if (File.Exists(cachePath))
             {

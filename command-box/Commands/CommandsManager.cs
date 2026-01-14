@@ -2,6 +2,8 @@
 using command_box.Common;
 using command_box.Delegates;
 using command_box.Enums;
+using command_box.Interfaces;
+using command_box.InternalCommands;
 
 namespace command_box.Commands
 {
@@ -37,11 +39,11 @@ namespace command_box.Commands
             {
                 string dirName = kvp.Key;
                 string dirPath = kvp.Value;
-
-                WriteLine($" - {dirName}: {dirPath}");
                 if (!Directory.Exists(dirPath))
                     Directory.CreateDirectory(dirPath);
             }
+
+            WriteLine($"    - use dir to see all app directories");
         }
         private void LoadCommands()
         {
@@ -58,54 +60,21 @@ namespace command_box.Commands
 
             Commands.LoadCache(Paths.Cache);
             LoadHistory();
+
+            WriteLine($"Use help to see all available commands");
         }
         private void InitializeInternalCommands()
         {
-            Commands.Add(new Command("help", "Show all available commands", "", "help", CommandType.Internal)
-            {
-                Action = ShowHelp
-            });
-
-            Commands.Add(new Command("dir", "Show all application directories", "", "dir", CommandType.Internal)
-            {
-                Action = ShowDirectories
-            });
-
-            Commands.Add(new Command("cache", "Manages the cache (save, load, refresh, clear).", "", "cache [save|load|refresh|clear]", CommandType.Internal)
-            {
-                Action = Cache
-            });
-
-            Commands.Add(new Command("history", "Manages the history (save, load, clear).", "", "history [save|load|clear]", CommandType.Internal)
-            { 
-                Action = History
-            });
+            Commands.Add(new HelpCommand(Commands, WriteLine));
+            Commands.Add(new DirectoriesCommand(WriteLine));
+            Commands.Add(new CacheCommand(Commands, WriteLine));
+            Commands.Add(new HistoryCommand(CommandsHistory, WriteLine));
         }
-        public void SaveHistory()
-        {
-            WriteLine("Saving command history...");
-            File.WriteAllLines(Paths.History, CommandsHistory);
-        }
-        private void LoadHistory()
-        {
-            if (!File.Exists(Paths.History))
-                return;
-            WriteLine("Loading command history...");
-            var historyLines = File.ReadAllLines(Paths.History);
-            CommandsHistory.Clear();
-            CommandsHistory.AddRange(historyLines);
-        }
-        private void ClearHistory()
-        {
-            WriteLine("Clearing command history...");
-            CommandsHistory.Clear();
-            if (File.Exists(Paths.History))
-                File.Delete(Paths.History);
-        }
-
+        public void SaveHistory() => ExecuteCommand("history", new string[] { "save" });
+        private void LoadHistory() => ExecuteCommand("history", new string[] { "load" });
         public void ExecuteCommand(string commandName, string[] args)
         {
-            Command command = Commands.FirstOrDefault(c => c.Name.Equals(commandName, StringComparison.OrdinalIgnoreCase));
+            ICommand command = Commands.GetByName(commandName);
             if (command == null)
             {
                 WriteLine($"Command '{commandName}' not found.");
@@ -113,99 +82,6 @@ namespace command_box.Commands
             }
             WriteLine($"Executing command: {command.Name}");
             command.Execute(args);
-        }
-
-        public void ShowDirectories(string[] args)
-        {
-            WriteLine();
-            WriteLine("-------------------------------------------------------");
-            WriteLine($"Application Directory");
-            WriteLine("-------------------------------------------------------");
-
-            int maxNameLength = _directories.Max(c => c.Key.Length);
-
-            foreach (var kvp in _directories)
-            {
-                string dirName = kvp.Key;
-                string dirPath = kvp.Value;
-
-                string paddedName = dirName.PadRight(maxNameLength);
-                WriteLine($"{paddedName} : {dirPath}");
-            }
-
-            WriteLine("-------------------------------------------------------");
-        }
-        public void ShowHelp(string[] args)
-        {
-            WriteLine();
-            WriteLine("-------------------------------------------------------");
-            WriteLine("Available Commands");
-            WriteLine("-------------------------------------------------------");
-
-            int maxNameLength = Commands.Max(c => c.Name.Length);
-
-            foreach (var command in Commands)
-            {
-                string paddedName = command.Name.PadRight(maxNameLength);
-                WriteLine($"{paddedName} : {command.Description}");
-
-                string indent = new string(' ', maxNameLength);
-                WriteLine($"{indent} : {command.Usage}");
-            }
-
-            WriteLine("-------------------------------------------------------");
-        }
-
-        private void Cache(string[] args)
-        {
-            if (args.Length == 0)
-            {
-                WriteLine("Usage: cache [save|load|refresh|clear]");
-                return;
-            }
-
-            switch (args[0])
-            {
-                case "save":
-                    Commands.SaveCache(Paths.Cache);
-                    break;
-                case "load":
-                    Commands.LoadCache(Paths.Cache);
-                    break;
-                case "clear":
-                    Commands.ClearCache(Paths.Cache);
-                    break;
-                case "refresh":
-                    Commands.RefreshCache(Paths.ScriptsDir, Paths.Cache);
-                    break;
-                default:
-                    WriteLine("Usage: cache [save|load|refresh|clear]");
-                    break;
-            }
-        }
-        private void History(string[] args)
-        {
-            if (args.Length == 0)
-            {
-                WriteLine("Usage: history [save|load|clear]");
-                return;
-            }
-
-            switch (args[0])
-            {
-                case "save":
-                    SaveHistory();
-                    break;
-                case "load":
-                    LoadHistory();
-                    break;
-                case "clear":
-                    ClearHistory();
-                    break;
-                default:
-                    WriteLine("Usage: history [save|load|clear]");
-                    break;
-            }
         }
     }
 }

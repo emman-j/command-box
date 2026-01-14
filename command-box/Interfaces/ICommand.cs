@@ -9,7 +9,6 @@ namespace command_box.Interfaces
         string CommandPath { get; }
         string Usage { get; }
         CommandType Type { get; }
-        Action<string[]> Action { get; set; }
         void Execute(string[] args);
     }
 }

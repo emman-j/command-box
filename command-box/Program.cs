@@ -64,7 +64,6 @@ namespace command_box
             string version = CommandsManager.AppVersion;
 
             Console.WriteLine();
-            Console.WriteLine();
             WriteLine("================================================================================================");
             WriteLine("                                                                                                ");
             WriteLine("  ██████╗ ██████╗ ███╗   ███╗███╗   ███╗ █████╗ ███╗   ██╗██████╗     ██████╗  ██████╗ ██╗  ██╗ ");
