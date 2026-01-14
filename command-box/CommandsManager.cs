@@ -29,9 +29,7 @@ namespace command_box
 
         public CommandsManager(WriteLineDelegate writeLine = null)
         {
-            if (writeLine == null)
-                WriteLine = Console.WriteLine;
-            WriteLine = writeLine;
+            WriteLine = writeLine ?? Console.WriteLine;
             EnsureAppDirectory();
             LoadCommands();
         }
