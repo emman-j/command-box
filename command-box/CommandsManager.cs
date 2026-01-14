@@ -10,7 +10,7 @@ namespace command_box
 {
     public class CommandsManager
     {
-        private Dictionary<string, string> directories = new Dictionary<string, string>()
+        private Dictionary<string, string> _directories = new Dictionary<string, string>()
         {
             {"Scripts Directory", Paths.ScriptsDir },
             {"Data Directory", Paths.DataDir },
@@ -40,7 +40,7 @@ namespace command_box
         private void EnsureAppDirectory()
         {
             WriteLine($"Ensuring application directories exist...");
-            foreach (var kvp in directories)
+            foreach (var kvp in _directories)
             {
                 string dirName = kvp.Key;
                 string dirPath = kvp.Value;
@@ -129,9 +129,9 @@ namespace command_box
             WriteLine($"Application Directory");
             WriteLine("-------------------------------------------------------");
 
-            int maxNameLength = directories.Max(c => c.Key.Length);
+            int maxNameLength = _directories.Max(c => c.Key.Length);
 
-            foreach (var kvp in directories)
+            foreach (var kvp in _directories)
             {
                 string dirName = kvp.Key;
                 string dirPath = kvp.Value;
