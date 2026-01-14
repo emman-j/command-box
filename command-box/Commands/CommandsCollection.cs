@@ -132,8 +132,14 @@ namespace command_box.Commands
 
             WriteLine($"Loading commands from cache...");
             string json = File.ReadAllText(cachePath);
-            CommandsCollection commands = JsonConvert.DeserializeObject<CommandsCollection>(json);
-            AddRange(commands);
+
+            // Deserialize as List<Command> to avoid issues with Collection<ICommand>
+            var commands = JsonConvert.DeserializeObject<List<Command>>(json);
+
+            if (commands != null)
+            {
+                AddRange(commands);
+            }
         }
         public void RefreshCache(string directoryPath, string cachePath)
         {
