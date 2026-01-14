@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,6 +10,11 @@ namespace command_box
 {
     public class CommandsManager
     {
+        public static string Build = "alpha";
+        public static string AssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        public static string AppVersion = $"{AssemblyVersion}-{Build}";
+
+
         private Dictionary<string, string> directories = new Dictionary<string, string>()
         {
             {"Scripts Directory", Paths.ScriptsDir },
