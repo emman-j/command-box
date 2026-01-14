@@ -53,14 +53,8 @@ namespace command_box
             }
         }
 
-        private static void WriteLine(string message = "")
-        {
-            Console.WriteLine("> " + message);
-        }
-        private static void Write(string message = "")
-        {
-            Console.Write(message);
-        }
+        private static void WriteLine(string message = "") => Console.WriteLine("> " + message);
+        private static void Write(string message = "") => Console.Write(message);
 
         private static void StartupBanner()
         {
