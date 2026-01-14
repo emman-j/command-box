@@ -29,8 +29,9 @@ namespace command_box
                     args = input.Split(' ');
                 }
 
-                if (!string.IsNullOrWhiteSpace(string.Join(' ', args)))
-                    commandsManager.CommandsHistory.Add(string.Join(' ', args));
+                string commandLine = string.Join(' ', args).Trim();
+                if (!string.IsNullOrWhiteSpace(commandLine) && commandsManager.CommandsHistory.LastOrDefault() != commandLine)
+                    commandsManager.CommandsHistory.Add(commandLine);
 
                 string command = args[0];
 
