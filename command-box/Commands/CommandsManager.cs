@@ -2,6 +2,8 @@
 using command_box.Common;
 using command_box.Delegates;
 using command_box.Enums;
+using command_box.Interfaces;
+using command_box.InternalCommands;
 
 namespace command_box.Commands
 {
@@ -61,25 +63,10 @@ namespace command_box.Commands
         }
         private void InitializeInternalCommands()
         {
-            Commands.Add(new Command("help", "Show all available commands", "", "help", CommandType.Internal)
-            {
-                Action = ShowHelp
-            });
-
-            Commands.Add(new Command("dir", "Show all application directories", "", "dir", CommandType.Internal)
-            {
-                Action = ShowDirectories
-            });
-
-            Commands.Add(new Command("cache", "Manages the cache (save, load, refresh, clear).", "", "cache [save|load|refresh|clear]", CommandType.Internal)
-            {
-                Action = Cache
-            });
-
-            Commands.Add(new Command("history", "Manages the history (save, load, clear).", "", "history [save|load|clear]", CommandType.Internal)
-            { 
-                Action = History
-            });
+            Commands.Add(new HelpCommand(Commands, WriteLine));
+            Commands.Add(new DirectoriesCommand(WriteLine));
+            Commands.Add(new CacheCommand(Commands, WriteLine));
+            Commands.Add(new HistoryCommand(CommandsHistory, WriteLine));
         }
         public void SaveHistory() => ExecuteCommand("history", new string[] { "save" });
         private void LoadHistory() => ExecuteCommand("history", new string[] { "load" });
