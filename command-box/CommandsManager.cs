@@ -19,10 +19,10 @@ namespace command_box
             {"Console Logs Directory", Paths.ConsoleLogsDir }
         };
 
-        public static string Build = "alpha";
-        public static string AssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        public static string AppVersion = $"{AssemblyVersion}-{Build}";
-        public CommandsCollection Commands { get; private set; }
+        public static readonly string Build = "alpha";
+        public static readonly string AssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        public static readonly string AppVersion = $"{AssemblyVersion}-{Build}";
+        public CommandsCollection Commands { get; private set; } = new CommandsCollection();
         public List<string> CommandsHistory { get; set; } = new List<string>();
         public WriteLineDelegate WriteLine { get; set; }
 
