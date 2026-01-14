@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using command_box.Commands;
+using System.Reflection;
 using System.Text;
 
 namespace command_box
