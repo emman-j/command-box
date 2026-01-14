@@ -10,7 +10,7 @@ namespace command_box
 {
     public class CommandsManager
     {
-        private Dictionary<string, string> _directories = new Dictionary<string, string>()
+        private readonly Dictionary<string, string> _directories = new Dictionary<string, string>()
         {
             {"Scripts Directory", Paths.ScriptsDir },
             {"Data Directory", Paths.DataDir },
