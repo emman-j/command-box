@@ -10,11 +10,6 @@ namespace command_box
 {
     public class CommandsManager
     {
-        public static string Build = "alpha";
-        public static string AssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        public static string AppVersion = $"{AssemblyVersion}-{Build}";
-
-
         private Dictionary<string, string> directories = new Dictionary<string, string>()
         {
             {"Scripts Directory", Paths.ScriptsDir },
@@ -24,7 +19,9 @@ namespace command_box
             {"Console Logs Directory", Paths.ConsoleLogsDir }
         };
 
-
+        public static string Build = "alpha";
+        public static string AssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        public static string AppVersion = $"{AssemblyVersion}-{Build}";
         public CommandsCollection Commands { get; private set; }
         public List<string> CommandsHistory { get; set; } = new List<string>();
         public WriteLineDelegate WriteLine { get; set; }
