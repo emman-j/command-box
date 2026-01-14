@@ -1,11 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using command_box.Delegates;
 using command_box.Enums;
+using command_box.Interfaces;
 using Newtonsoft.Json;
 
 namespace command_box.Commands
 {
-    public class CommandsCollection : Collection<Command>
+    public class CommandsCollection : Collection<ICommand>
     {
         [JsonIgnore]
         public WriteLineDelegate WriteLine { get; set; }
@@ -14,7 +15,7 @@ namespace command_box.Commands
         {
             WriteLine = Console.WriteLine;
         }
-        public CommandsCollection(IEnumerable<Command> commands) : this()
+        public CommandsCollection(IEnumerable<ICommand> commands) : this()
         {
             AddRange(commands);
         }
@@ -44,14 +45,14 @@ namespace command_box.Commands
             return meta;
         }
 
-        public void AddRange(IEnumerable<Command> commands)
+        public void AddRange(IEnumerable<ICommand> commands)
         {
             foreach (var command in commands)
             {
                 Add(command);
             }
         }
-        public void RemoveRange(IEnumerable<Command> commands)
+        public void RemoveRange(IEnumerable<ICommand> commands)
         {
             foreach (var command in commands)
             {
