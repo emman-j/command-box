@@ -63,6 +63,14 @@ namespace command_box.Commands
         {
             return this.FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
+        public CommandsCollection GetByType(CommandType type)
+        {
+            return new CommandsCollection(this.Where(c => c.Type == type));
+        }
+        public CommandsCollection GetAllExceptType(CommandType type)
+        {
+            return new CommandsCollection(this.Where(c => c.Type != type));
+        }
 
         public void LoadCommandsFromDirectory(string directoryPath)
         {
