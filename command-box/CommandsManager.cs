@@ -10,12 +10,7 @@ namespace command_box
 {
     public class CommandsManager
     {
-        public static string Build = "alpha";
-        public static string AssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        public static string AppVersion = $"{AssemblyVersion}-{Build}";
-
-
-        private Dictionary<string, string> directories = new Dictionary<string, string>()
+        private readonly Dictionary<string, string> _directories = new Dictionary<string, string>()
         {
             {"Scripts Directory", Paths.ScriptsDir },
             {"Data Directory", Paths.DataDir },
@@ -24,17 +19,17 @@ namespace command_box
             {"Console Logs Directory", Paths.ConsoleLogsDir }
         };
 
-
-        public CommandsCollection Commands { get; private set; }
+        public static readonly string Build = "alpha";
+        public static readonly string AssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        public static readonly string AppVersion = $"{AssemblyVersion}-{Build}";
+        public CommandsCollection Commands { get; private set; } = new CommandsCollection();
         public List<string> CommandsHistory { get; set; } = new List<string>();
         public WriteLineDelegate WriteLine { get; set; }
 
 
         public CommandsManager(WriteLineDelegate writeLine = null)
         {
-            if (writeLine == null)
-                WriteLine = Console.WriteLine;
-            WriteLine = writeLine;
+            WriteLine = writeLine ?? Console.WriteLine;
             EnsureAppDirectory();
             LoadCommands();
         }
@@ -43,7 +38,7 @@ namespace command_box
         private void EnsureAppDirectory()
         {
             WriteLine($"Ensuring application directories exist...");
-            foreach (var kvp in directories)
+            foreach (var kvp in _directories)
             {
                 string dirName = kvp.Key;
                 string dirPath = kvp.Value;
@@ -132,9 +127,9 @@ namespace command_box
             WriteLine($"Application Directory");
             WriteLine("-------------------------------------------------------");
 
-            int maxNameLength = directories.Max(c => c.Key.Length);
+            int maxNameLength = _directories.Max(c => c.Key.Length);
 
-            foreach (var kvp in directories)
+            foreach (var kvp in _directories)
             {
                 string dirName = kvp.Key;
                 string dirPath = kvp.Value;
