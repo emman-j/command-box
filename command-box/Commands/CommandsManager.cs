@@ -39,11 +39,11 @@ namespace command_box.Commands
             {
                 string dirName = kvp.Key;
                 string dirPath = kvp.Value;
-
-                WriteLine($" - {dirName}: {dirPath}");
                 if (!Directory.Exists(dirPath))
                     Directory.CreateDirectory(dirPath);
             }
+
+            WriteLine($" - use dir to see all app directories");
         }
         private void LoadCommands()
         {
