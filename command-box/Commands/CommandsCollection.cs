@@ -59,6 +59,10 @@ namespace command_box.Commands
                 Remove(command);
             }
         }
+        public ICommand? GetByName(string name)
+        {
+            return this.FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
 
         public void LoadCommandsFromDirectory(string directoryPath)
         {
