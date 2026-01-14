@@ -43,7 +43,7 @@ namespace command_box.Commands
                     Directory.CreateDirectory(dirPath);
             }
 
-            WriteLine($" - use dir to see all app directories");
+            WriteLine($"    - use dir to see all app directories");
         }
         private void LoadCommands()
         {
@@ -60,6 +60,8 @@ namespace command_box.Commands
 
             Commands.LoadCache(Paths.Cache);
             LoadHistory();
+
+            WriteLine($"Use help to see all available commands");
         }
         private void InitializeInternalCommands()
         {
