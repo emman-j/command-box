@@ -1,11 +1,6 @@
 ﻿using command_box.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace command_box
+namespace command_box.Interfaces
 {
     public interface ICommand
     {
@@ -14,6 +9,7 @@ namespace command_box
         string CommandPath { get; }
         string Usage { get; }
         CommandType Type { get; }
+        Action<string[]> Action { get; set; }
         void Execute(string[] args);
     }
 }

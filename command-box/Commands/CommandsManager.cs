@@ -1,12 +1,9 @@
-﻿using command_box.Global;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
+using command_box.Common;
+using command_box.Delegates;
+using command_box.Enums;
 
-namespace command_box
+namespace command_box.Commands
 {
     public class CommandsManager
     {
@@ -26,14 +23,12 @@ namespace command_box
         public List<string> CommandsHistory { get; set; } = new List<string>();
         public WriteLineDelegate WriteLine { get; set; }
 
-
         public CommandsManager(WriteLineDelegate writeLine = null)
         {
             WriteLine = writeLine ?? Console.WriteLine;
             EnsureAppDirectory();
             LoadCommands();
         }
-
 
         private void EnsureAppDirectory()
         {
@@ -66,22 +61,22 @@ namespace command_box
         }
         private void InitializeInternalCommands()
         {
-            Commands.Add(new Command("help", "Show all available commands", "", "help", Enums.CommandType.Internal)
+            Commands.Add(new Command("help", "Show all available commands", "", "help", CommandType.Internal)
             {
                 Action = ShowHelp
             });
 
-            Commands.Add(new Command("dir", "Show all application directories", "", "dir", Enums.CommandType.Internal)
+            Commands.Add(new Command("dir", "Show all application directories", "", "dir", CommandType.Internal)
             {
                 Action = ShowDirectories
             });
 
-            Commands.Add(new Command("cache", "Manages the cache (save, load, refresh, clear).", "", "cache [save|load|refresh|clear]", Enums.CommandType.Internal)
+            Commands.Add(new Command("cache", "Manages the cache (save, load, refresh, clear).", "", "cache [save|load|refresh|clear]", CommandType.Internal)
             {
                 Action = Cache
             });
 
-            Commands.Add(new Command("history", "Manages the history (save, load, clear).", "", "history [save|load|clear]", Enums.CommandType.Internal)
+            Commands.Add(new Command("history", "Manages the history (save, load, clear).", "", "history [save|load|clear]", CommandType.Internal)
             { 
                 Action = History
             });

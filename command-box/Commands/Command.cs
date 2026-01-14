@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics;
 using command_box.Enums;
+using command_box.Interfaces;
 using Newtonsoft.Json;
 
-namespace command_box
+namespace command_box.Commands
 {
     public class Command : ICommand
     {
