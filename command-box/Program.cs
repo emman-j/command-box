@@ -1,4 +1,5 @@
 ﻿using command_box.Commands;
+using command_box.Common;
 using System.Reflection;
 using System.Text;
 
@@ -10,6 +11,7 @@ namespace command_box
         {
             StartupBanner();
 
+            ErrorLogger.Instance.Initialize(Paths.ErrorLogsDir, Console.WriteLine);
             CommandsManager commandsManager = new CommandsManager(WriteLine);
             
             AppDomain.CurrentDomain.ProcessExit += (s,e) =>
