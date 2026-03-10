@@ -1,8 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using command_box.Common;
 using command_box.Delegates;
 using command_box.Enums;
 using command_box.Interfaces;
 using Newtonsoft.Json;
+using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 
 namespace command_box.Commands
 {
@@ -10,10 +12,12 @@ namespace command_box.Commands
     {
         [JsonIgnore]
         public WriteLineDelegate WriteLine { get; set; }
+        public event Action<Exception, string> OnError;
 
         public CommandsCollection()
         {
             WriteLine = Console.WriteLine;
+            OnError += OnErrorOccured;
         }
         public CommandsCollection(IEnumerable<ICommand> commands) : this()
         {
@@ -23,6 +27,13 @@ namespace command_box.Commands
         {
             WriteLine = writeLine;
         }
+        private void HandleError(Exception ex, [CallerMemberName] string operation = "")
+            => OnError?.Invoke(ex, operation);
+        private void OnErrorOccured(Exception exception, string operation)
+        {
+            ErrorLogger.Instance?.LogException(this, exception, operation);
+        }
+
         
         private static Dictionary<string, string> ParseMetadata(string path)
         {
@@ -117,13 +128,22 @@ namespace command_box.Commands
         }
         public void SaveCache(string cachePath)
         {
+            try
+            {
             WriteLine($"Saving commands cache...");
             var scriptCommands = GetAllExceptType(CommandType.Internal);
             string json = JsonConvert.SerializeObject(scriptCommands, Formatting.Indented);
             File.WriteAllText(cachePath, json);
         }
+            catch (Exception ex)
+            {
+                HandleError(ex);
+            }
+        }
         public void LoadCache(string cachePath)
         {
+            try
+            {
             if (!File.Exists(cachePath))
                 throw new DirectoryNotFoundException($"The scripts cache '{cachePath}' does not exist.");
 
@@ -140,16 +160,30 @@ namespace command_box.Commands
             {
                 AddRange(commands);
             }
+            }
+            catch (Exception ex)
+            {
+                HandleError(ex);
+        }
         }
         public void RefreshCache(string directoryPath, string cachePath)
         {
+            try
+            {
             WriteLine($"Refeshing cache...");
             ClearCache(cachePath);
             LoadCommandsFromDirectory(directoryPath);
             SaveCache(cachePath);
         }
+            catch (Exception ex)
+            {
+                HandleError(ex);
+            }
+        }
         public void ClearCache(string cachePath)
         {
+            try
+            {
             CommandsCollection commands = GetAllExceptType(CommandType.Internal);
             RemoveRange(commands);
             if (File.Exists(cachePath))
