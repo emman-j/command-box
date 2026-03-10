@@ -39,6 +39,8 @@ namespace command_box.Common
 
         }
 
+        #endregion
+
         public void Initialize(string logPath, WriteLineDelegate writeLine = null)
         {
             _logFilePath = logPath;
@@ -86,7 +88,6 @@ namespace command_box.Common
             string errorTitle = string.IsNullOrWhiteSpace(exceptionType) ? "CommandBox Error" : $"CommandBox {exceptionType} Error";
             string fullMessage = message + "\n\nSee logs for more detail.";
 
-            WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             WriteLine($"!!!!!!!!!!! {exceptionType} ERROR !!!!!!!!!!!");
             WriteLine(errorTitle);
             WriteLine(fullMessage);
