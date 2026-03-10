@@ -17,19 +17,27 @@ namespace command_box.Commands
             {"Error Logs Directory", Paths.ErrorLogsDir },
             {"Console Logs Directory", Paths.ConsoleLogsDir }
         };
-
         public static readonly string Build = "alpha";
         public static readonly string AssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
         public static readonly string AppVersion = $"{AssemblyVersion}-{Build}";
         public CommandsCollection Commands { get; private set; } = new CommandsCollection();
         public List<string> CommandsHistory { get; set; } = new List<string>();
         public WriteLineDelegate WriteLine { get; set; }
+        public event Action<Exception, string> OnError;
 
         public CommandsManager(WriteLineDelegate writeLine = null)
         {
             WriteLine = writeLine ?? Console.WriteLine;
             EnsureAppDirectory();
             LoadCommands();
+            OnError += OnErrorOccured;
+        }
+
+        private void HandleError(Exception ex, [CallerMemberName] string operation = "")
+            => OnError?.Invoke(ex, operation);
+        private void OnErrorOccured(Exception exception, string operation)
+        {
+            ErrorLogger.Instance?.LogException(this, exception, operation);
         }
 
         private void EnsureAppDirectory()
