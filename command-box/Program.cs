@@ -21,6 +21,8 @@ namespace command_box
 
             while (true)
             { 
+                try
+                {
                 if (args.Length == 0)
                 {
                     Write("> ");
@@ -53,8 +55,16 @@ namespace command_box
 
                 string[] commandArgs = args.Skip(1).ToArray();
                 commandsManager.ExecuteCommand(command, commandArgs);
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Instance.LogException(typeof(Program), ex);
+                }
+                finally
+                {
                 args = Array.Empty<string>();
             }
+        }
         }
 
         private static void WriteLine(string message = "") => Console.WriteLine("> " + message);
@@ -84,6 +94,8 @@ namespace command_box
         }
         private static string ReadLineWithAutoComplete(CommandsManager commandsmanager)
         {
+            try
+            {
             CommandsCollection commands = commandsmanager.Commands;
             StringBuilder input = new StringBuilder();
             int currentIndex = 0;
@@ -237,6 +249,12 @@ namespace command_box
                         }
                         continue;
                 }
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.Instance.LogException(typeof(Program), ex);
+                return string.Empty;
             }
         }
 
