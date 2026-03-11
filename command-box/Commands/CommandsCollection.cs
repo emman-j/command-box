@@ -1,8 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using command_box.Common;
 using command_box.Delegates;
 using command_box.Enums;
 using command_box.Interfaces;
 using Newtonsoft.Json;
+using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 
 namespace command_box.Commands
 {
@@ -10,10 +12,12 @@ namespace command_box.Commands
     {
         [JsonIgnore]
         public WriteLineDelegate WriteLine { get; set; }
+        public event Action<Exception, string> OnError;
 
         public CommandsCollection()
         {
             WriteLine = Console.WriteLine;
+            OnError += OnErrorOccured;
         }
         public CommandsCollection(IEnumerable<ICommand> commands) : this()
         {
@@ -23,7 +27,14 @@ namespace command_box.Commands
         {
             WriteLine = writeLine;
         }
-        
+        private void HandleError(Exception ex, [CallerMemberName] string operation = "")
+            => OnError?.Invoke(ex, operation);
+        private void OnErrorOccured(Exception exception, string operation)
+        {
+            ErrorLogger.Instance?.LogException(this, exception, operation);
+        }
+
+
         private static Dictionary<string, string> ParseMetadata(string path)
         {
             var meta = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -44,6 +55,22 @@ namespace command_box.Commands
             }
             return meta;
         }
+
+        private bool ValidateMetadata(Dictionary<string, string> metadata, string scriptName, out string errorMessage)
+        {
+            var requiredFields = new[] { "description", "usage" };
+            var missing = requiredFields.Where(field => !metadata.ContainsKey(field)).ToList();
+
+            if (missing.Any())
+            {
+                errorMessage = $"Missing required metadata: {string.Join(", ", missing.Select(f => $"@meta {f}"))}";
+                return false;
+            }
+
+            errorMessage = null;
+            return true;
+        }
+
 
         public void AddRange(IEnumerable<ICommand> commands)
         {
@@ -79,83 +106,137 @@ namespace command_box.Commands
 
             WriteLine($"Loading commands from directory...");
 
+            int loaded = 0;
+            int skipped = 0;
+            int errors = 0;
+
             foreach (string file in Directory.GetFiles(directoryPath))
             {
-                string name = Path.GetFileNameWithoutExtension(file);
-                string ext = Path.GetExtension(file).ToLower();
-
-                WriteLine($" - {name}");
-
-                CommandType type;
-                switch (ext)
+                try
                 {
-                    case ".bat":
-                        type = CommandType.Batch;
-                        break;
-                    case ".ps1":
-                        type = CommandType.PowerShell;
-                        break;
-                    case ".py":
-                        type = CommandType.Python;
-                        break;
-                    default:
+                    string name = Path.GetFileNameWithoutExtension(file);
+                    string ext = Path.GetExtension(file).ToLower();
+
+                    WriteLine($" - {name}");
+
+                    CommandType type;
+                    switch (ext)
+                    {
+                        case ".bat":
+                            type = CommandType.Batch;
+                            break;
+                        case ".ps1":
+                            type = CommandType.PowerShell;
+                            break;
+                        case ".py":
+                            type = CommandType.Python;
+                            break;
+                        default:
+                            continue;
+                    }
+
+                    var metadata = ParseMetadata(file);
+
+                    if (!ValidateMetadata(metadata, name, out string errorMessage))
+                    {
+                        WriteLine($"   Skipped: {errorMessage}");
+                        skipped++;
                         continue;
+                    }
+
+                    Command command = new Command(
+                        name,
+                        metadata["description"],
+                        file,
+                        metadata["usage"],
+                        type
+                    );
+
+                    Add(command);
+                    loaded++;
                 }
-
-                var metadata = ParseMetadata(file);
-
-                Command command = new Command(
-                    name,
-                    metadata["description"],
-                    file,
-                    metadata["usage"],
-                    type
-                );
-
-                Add(command);
+                catch (Exception ex)
+                {
+                    HandleError(ex);
+                    WriteLine($"Please make sure that the scripts have metadata headers");
+                    errors++;
+                    return;
+                }
             }
+
+            WriteLine();
+            WriteLine($"Summary: {loaded} loaded, {skipped} skipped, {errors} errors");
+
         }
         public void SaveCache(string cachePath)
         {
-            WriteLine($"Saving commands cache...");
-            var scriptCommands = GetAllExceptType(CommandType.Internal);
-            string json = JsonConvert.SerializeObject(scriptCommands, Formatting.Indented);
-            File.WriteAllText(cachePath, json);
+            try
+            {
+                WriteLine($"Saving commands cache...");
+                var scriptCommands = GetAllExceptType(CommandType.Internal);
+                string json = JsonConvert.SerializeObject(scriptCommands, Formatting.Indented);
+                File.WriteAllText(cachePath, json);
+            }
+            catch (Exception ex)
+            {
+                HandleError(ex);
+            }
         }
         public void LoadCache(string cachePath)
         {
-            if (!File.Exists(cachePath))
-                throw new DirectoryNotFoundException($"The scripts cache '{cachePath}' does not exist.");
-
-            CommandsCollection c = GetAllExceptType(CommandType.Internal);
-            RemoveRange(c);
-
-            WriteLine($"Loading commands from cache...");
-            string json = File.ReadAllText(cachePath);
-
-            // Deserialize as List<Command> to avoid issues with Collection<ICommand>
-            var commands = JsonConvert.DeserializeObject<List<Command>>(json);
-
-            if (commands != null)
+            try
             {
-                AddRange(commands);
+                if (!File.Exists(cachePath))
+                    throw new DirectoryNotFoundException($"The scripts cache '{cachePath}' does not exist.");
+
+                CommandsCollection c = GetAllExceptType(CommandType.Internal);
+                RemoveRange(c);
+
+                WriteLine($"Loading commands from cache...");
+                string json = File.ReadAllText(cachePath);
+
+                // Deserialize as List<Command> to avoid issues with Collection<ICommand>
+                var commands = JsonConvert.DeserializeObject<List<Command>>(json);
+
+                if (commands != null)
+                {
+                    AddRange(commands);
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleError(ex);
             }
         }
         public void RefreshCache(string directoryPath, string cachePath)
         {
-            WriteLine($"Refeshing cache...");
-            ClearCache(cachePath);
-            LoadCommandsFromDirectory(directoryPath);
-            SaveCache(cachePath);
+            try
+            {
+                WriteLine($"Refeshing cache...");
+                ClearCache(cachePath);
+                LoadCommandsFromDirectory(directoryPath);
+                SaveCache(cachePath);
+            }
+            catch (Exception ex)
+            {
+                HandleError(ex);
+            }
         }
         public void ClearCache(string cachePath)
         {
-            CommandsCollection commands = GetAllExceptType(CommandType.Internal);
-            RemoveRange(commands);
-            if (File.Exists(cachePath))
+            try
             {
-                WriteLine($"Clearing commands cache...");
-                File.Delete(cachePath);
+                CommandsCollection commands = GetAllExceptType(CommandType.Internal);
+                RemoveRange(commands);
+                if (File.Exists(cachePath))
+                {
+                    WriteLine($"Clearing commands cache...");
+                    File.Delete(cachePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleError(ex);
             }
         }
     }
