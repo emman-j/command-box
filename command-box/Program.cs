@@ -23,38 +23,38 @@ namespace command_box
             { 
                 try
                 {
-                if (args.Length == 0)
-                {
-                    Write("> ");
-                    string input = ReadLineWithAutoComplete(commandsManager);
+                    if (args.Length == 0)
+                    {
+                        Write("> ");
+                        string input = ReadLineWithAutoComplete(commandsManager);
 
-                    if (string.IsNullOrWhiteSpace(input))
-                        continue;
+                        if (string.IsNullOrWhiteSpace(input))
+                            continue;
 
-                    args = input.Split(' ');
-                }
+                        args = input.Split(' ');
+                    }
 
-                string commandLine = string.Join(' ', args).Trim();
-                if (!string.IsNullOrWhiteSpace(commandLine) && commandsManager.CommandsHistory.LastOrDefault() != commandLine)
-                    commandsManager.CommandsHistory.Add(commandLine);
+                    string commandLine = string.Join(' ', args).Trim();
+                    if (!string.IsNullOrWhiteSpace(commandLine) && commandsManager.CommandsHistory.LastOrDefault() != commandLine)
+                        commandsManager.CommandsHistory.Add(commandLine);
 
-                string command = args[0];
+                    string command = args[0];
 
-                switch (command.ToLower())
-                {
-                    case "cls":
-                    case "clear":
-                        Console.Clear();
-                        args = Array.Empty<string>();
-                        continue;
-                    case "exit":
-                    case "quit":
-                    case "-q":
-                        return;
-                }
+                    switch (command.ToLower())
+                    {
+                        case "cls":
+                        case "clear":
+                            Console.Clear();
+                            args = Array.Empty<string>();
+                            continue;
+                        case "exit":
+                        case "quit":
+                        case "-q":
+                            return;
+                    }
 
-                string[] commandArgs = args.Skip(1).ToArray();
-                commandsManager.ExecuteCommand(command, commandArgs);
+                    string[] commandArgs = args.Skip(1).ToArray();
+                    commandsManager.ExecuteCommand(command, commandArgs);
                 }
                 catch (Exception ex)
                 {
@@ -62,9 +62,9 @@ namespace command_box
                 }
                 finally
                 {
-                args = Array.Empty<string>();
+                    args = Array.Empty<string>();
+                }
             }
-        }
         }
 
         private static void WriteLine(string message = "") => Console.WriteLine("> " + message);
@@ -248,7 +248,7 @@ namespace command_box
                             Console.SetCursorPosition(promptLength + currentIndex, Console.CursorTop);
                         }
                         continue;
-                }
+                    }
                 }
             }
             catch (Exception ex)
