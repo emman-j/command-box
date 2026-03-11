@@ -72,9 +72,21 @@ namespace command_box.Common
 
             return logEntry;
         }
+        public void LogException(Type sourceType, Exception ex, [CallerMemberName] string operation = "", bool showError = true)
+        {
+            string className = sourceType?.Name ?? "Unknown";
+            LogExceptionInternal(className, ex, operation, showError);
+        }
+
         public void LogException(object sender, Exception ex, [CallerMemberName] string operation = "", bool showError = true)
         {
-            string log = GetLogEntry(sender.GetType().Name, ex, operation);
+            string className = sender?.GetType().Name ?? "Unknown";
+            LogExceptionInternal(className, ex, operation, showError);
+        }
+
+        private void LogExceptionInternal(string sender, Exception ex, string operation, bool showError)
+        {
+            string log = GetLogEntry(sender, ex, operation);
             log = $"{DateTime.Now:hh:mm:ss} {log}";
             EnsureLogFilePath();
             AppendToLogFile(log);
