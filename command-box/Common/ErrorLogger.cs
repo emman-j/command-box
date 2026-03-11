@@ -44,6 +44,7 @@ namespace command_box.Common
         public void Initialize(string logPath, WriteLineDelegate writeLine = null)
         {
             _logFilePath = logPath;
+            _logFilePath = Path.Combine(logPath, $"err_{DateTime.Now:MMddyy}");
             if (writeLine != null)
                 WriteLine = writeLine;
         }
