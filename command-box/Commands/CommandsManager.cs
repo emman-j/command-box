@@ -71,7 +71,7 @@ namespace command_box.Commands
 
                 if (!File.Exists(Paths.Cache))
                 {
-                    Commands.LoadCommandsFromDirectory(Paths.ScriptsDir);
+                    Commands.LoadCommandsFromDirectory(new string[] { Paths.ScriptsDir, Paths.ExeDir });
                     Commands.SaveCache(Paths.Cache);
                     return;
                 }

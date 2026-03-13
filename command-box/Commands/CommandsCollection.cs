@@ -4,6 +4,7 @@ using command_box.Enums;
 using command_box.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace command_box.Commands
@@ -99,27 +100,32 @@ namespace command_box.Commands
             return new CommandsCollection(this.Where(c => c.Type != type));
         }
 
-        public void LoadCommandsFromDirectory(string directoryPath)
+        public void LoadCommandsFromDirectory(string[] directoryPaths)
         {
-            if(!Directory.Exists(directoryPath))
-                throw new DirectoryNotFoundException($"The scripts directory '{directoryPath}' does not exist.");
-
-            WriteLine($"Loading commands from directory...");
-
             int loaded = 0;
             int skipped = 0;
             int errors = 0;
 
-            foreach (string file in Directory.GetFiles(directoryPath))
+            foreach (var directory in directoryPaths)
             {
-                try
+                if (!Directory.Exists(directory))
+                {
+                    WriteLine($"Directory not found: {directory}");
+                    return;
+                }
+
+                WriteLine($"Loading commands from {Path.GetFileName(directory)}...");
+
+                foreach (string file in Directory.GetFiles(directory))
                 {
                     string name = Path.GetFileNameWithoutExtension(file);
                     string ext = Path.GetExtension(file).ToLower();
 
-                    WriteLine($" - {name}");
-
                     CommandType type;
+                    bool requiresMetadata = true;
+                    bool isShortcut = false;
+                    string actualPath = file;
+
                     switch (ext)
                     {
                         case ".bat":
@@ -131,42 +137,127 @@ namespace command_box.Commands
                         case ".py":
                             type = CommandType.Python;
                             break;
+                        case ".lnk":  // ← Handle shortcuts
+                            try
+                            {
+                                actualPath = ShortcutResolver.ResolveShortcut(file);
+
+                                if (string.IsNullOrWhiteSpace(actualPath) || !File.Exists(actualPath))
+                                {
+                                    WriteLine($" - {name}");
+                                    WriteLine($"Error: Shortcut target not found");
+                                    errors++;
+                                    continue;
+                                }
+
+                                // Determine type based on target
+                                string targetExt = Path.GetExtension(actualPath).ToLower();
+                                if (targetExt == ".exe")
+                                {
+                                    type = CommandType.Executable;
+                                    requiresMetadata = false;
+                                    isShortcut = true;
+                                }
+                                else
+                                {
+                                    WriteLine($" - {name}");
+                                    WriteLine($"Skipped: Shortcut target is not an executable ({targetExt})");
+                                    skipped++;
+                                    continue;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                WriteLine($" - {name}");
+                                WriteLine($"Error resolving shortcut: {ex.Message}");
+                                errors++;
+                                continue;
+                            }
+                            break;
+                        case ".exe":
+                            type = CommandType.Executable;
+                            requiresMetadata = false;
+                            break;
                         default:
-                            continue;
+                            continue; // Skip non-script/non-executable files
                     }
 
-                    var metadata = ParseMetadata(file);
+                    WriteLine($" - {name}");
 
-                    if (!ValidateMetadata(metadata, name, out string errorMessage))
+                    try
                     {
-                        WriteLine($"   Skipped: {errorMessage}");
-                        skipped++;
-                        continue;
+                        Dictionary<string, string> metadata;
+
+                        if (requiresMetadata)
+                        {
+                            metadata = ParseMetadata(actualPath);
+
+                            if (!ValidateMetadata(metadata, name, out string errorMessage))
+                            {
+                                WriteLine($"Skipped: {errorMessage}");
+                                skipped++;
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            // For executables, try to get metadata
+                            metadata = TryGetExecutableMetadata(actualPath);
+                        }
+
+                        Add(new Command(
+                            name,
+                            metadata.GetValueOrDefault("description", $"{name} executable"),
+                            actualPath,  // Use resolved path, not .lnk path
+                            metadata.GetValueOrDefault("usage", name),
+                            type
+                        ));
+
+                        if (isShortcut)
+                            WriteLine($"Loaded (shortcut > {Path.GetFileName(actualPath)})");
+                        else
+                            WriteLine($"Loaded");
+
+                        loaded++;
                     }
-
-                    Command command = new Command(
-                        name,
-                        metadata["description"],
-                        file,
-                        metadata["usage"],
-                        type
-                    );
-
-                    Add(command);
-                    loaded++;
-                }
-                catch (Exception ex)
-                {
-                    HandleError(ex);
-                    WriteLine($"Please make sure that the scripts have metadata headers");
-                    errors++;
-                    return;
+                    catch (Exception ex)
+                    {
+                        WriteLine($"   ✗ Error: {ex.Message}");
+                        errors++;
+                    }
                 }
             }
-
+           
             WriteLine();
             WriteLine($"Summary: {loaded} loaded, {skipped} skipped, {errors} errors");
+        }
 
+        private Dictionary<string, string> TryGetExecutableMetadata(string exePath)
+        {
+            var metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            try
+            {
+                var versionInfo = FileVersionInfo.GetVersionInfo(exePath);
+
+                if (!string.IsNullOrWhiteSpace(versionInfo.FileDescription))
+                    metadata["description"] = versionInfo.FileDescription;
+                else
+                    metadata["description"] = Path.GetFileNameWithoutExtension(exePath);
+
+                if (!string.IsNullOrWhiteSpace(versionInfo.Comments))
+                    metadata["usage"] = versionInfo.Comments;
+                else
+                    metadata["usage"] = Path.GetFileNameWithoutExtension(exePath);
+            }
+            catch
+            {
+                // If we can't read version info, use filename
+                metadata["description"] = Path.GetFileNameWithoutExtension(exePath);
+                metadata["usage"] = Path.GetFileNameWithoutExtension(exePath);
+            }
+
+            return metadata;
         }
         public void SaveCache(string cachePath)
         {
@@ -208,13 +299,13 @@ namespace command_box.Commands
                 HandleError(ex);
             }
         }
-        public void RefreshCache(string directoryPath, string cachePath)
+        public void RefreshCache(string[] directoryPaths, string cachePath)
         {
             try
             {
                 WriteLine($"Refeshing cache...");
                 ClearCache(cachePath);
-                LoadCommandsFromDirectory(directoryPath);
+                LoadCommandsFromDirectory(directoryPaths);
                 SaveCache(cachePath);
             }
             catch (Exception ex)

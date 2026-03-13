@@ -9,6 +9,7 @@
         public static string DataDir { get => Path.Combine(AppDataPath, "data"); }
         public static string SettingsDir { get => Path.Combine(AppDataPath,"settings"); }
         public static string ScriptsDir { get => Path.Combine(AppDataPath, "scripts"); }
+        public static string ExeDir { get => Path.Combine(AppDataPath, "apps"); }
         public static string LogsDir { get => Path.Combine(DataDir, "logs"); }
         public static string ErrorLogsDir { get => Path.Combine(LogsDir, "error_logs"); }
         public static string ConsoleLogsDir { get => Path.Combine(LogsDir, "console_logs"); }
