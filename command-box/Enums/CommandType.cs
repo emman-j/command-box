@@ -9,5 +9,6 @@
         Shell,
         Python,
         Node,
+        Executable
     }
 }
