@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using command_box.Commands;
+using command_box.Common;
+using System.Reflection;
 using System.Text;
 
 namespace command_box
@@ -9,6 +11,7 @@ namespace command_box
         {
             StartupBanner();
 
+            ErrorLogger.Instance.Initialize(Paths.ErrorLogsDir, Console.WriteLine);
             CommandsManager commandsManager = new CommandsManager(WriteLine);
             
             AppDomain.CurrentDomain.ProcessExit += (s,e) =>
@@ -18,56 +21,60 @@ namespace command_box
 
             while (true)
             { 
-                if (args.Length == 0)
+                try
                 {
-                    Write("> ");
-                    string input = ReadLineWithAutoComplete(commandsManager);
+                    if (args.Length == 0)
+                    {
+                        Write("> ");
+                        string input = ReadLineWithAutoComplete(commandsManager);
 
-                    if (string.IsNullOrWhiteSpace(input))
-                        continue;
+                        if (string.IsNullOrWhiteSpace(input))
+                            continue;
 
-                    args = input.Split(' ');
+                        args = input.Split(' ');
+                    }
+
+                    string commandLine = string.Join(' ', args).Trim();
+                    if (!string.IsNullOrWhiteSpace(commandLine) && commandsManager.CommandsHistory.LastOrDefault() != commandLine)
+                        commandsManager.CommandsHistory.Add(commandLine);
+
+                    string command = args[0];
+
+                    switch (command.ToLower())
+                    {
+                        case "cls":
+                        case "clear":
+                            Console.Clear();
+                            args = Array.Empty<string>();
+                            continue;
+                        case "exit":
+                        case "quit":
+                        case "-q":
+                            return;
+                    }
+
+                    string[] commandArgs = args.Skip(1).ToArray();
+                    commandsManager.ExecuteCommand(command, commandArgs);
                 }
-
-                if (!string.IsNullOrWhiteSpace(string.Join(' ', args)))
-                    commandsManager.CommandsHistory.Add(string.Join(' ', args));
-
-                string command = args[0];
-
-                switch (command.ToLower())
+                catch (Exception ex)
                 {
-                    case "cls":
-                    case "clear":
-                        Console.Clear();
-                        args = Array.Empty<string>();
-                        continue;
-                    case "exit":
-                    case "quit":
-                    case "-q":
-                        return;
+                    ErrorLogger.Instance.LogException(typeof(Program), ex);
                 }
-
-                string[] commandArgs = args.Skip(1).ToArray();
-                commandsManager.ExecuteCommand(command, commandArgs);
-                args = Array.Empty<string>();
+                finally
+                {
+                    args = Array.Empty<string>();
+                }
             }
         }
 
-        private static void WriteLine(string message = "")
-        {
-            Console.WriteLine("> " + message);
-        }
-        private static void Write(string message = "")
-        {
-            Console.Write(message);
-        }
+        private static void WriteLine(string message = "") => Console.WriteLine("> " + message);
+        private static void Write(string message = "") => Console.Write(message);
 
         private static void StartupBanner()
         {
             #region ASCII Art
-            string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            string version = CommandsManager.AppVersion;
 
-            Console.WriteLine();
             Console.WriteLine();
             WriteLine("================================================================================================");
             WriteLine("                                                                                                ");
@@ -78,7 +85,7 @@ namespace command_box
             WriteLine(" ╚██████╗╚██████╔╝██║ ╚═╝ ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║██████╔╝    ██████╔╝╚██████╔╝██╔╝ ██╗ ");
             WriteLine("  ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝     ╚═════╝  ╚═════╝ ╚═╝  ╚═╝ ");
             WriteLine("                                                                                                ");
-            WriteLine($"                             Command Box - {version} alpha                                        ");
+            WriteLine($"                             Command Box - {version}                                         ");
             WriteLine("                          A simple command launcher utility                                   ");
             WriteLine("                   ASCII art by patorjk.com | Text to ASCII Art Generator                     ");
             WriteLine("================================================================================================");
@@ -87,7 +94,9 @@ namespace command_box
         }
         private static string ReadLineWithAutoComplete(CommandsManager commandsmanager)
         {
-            Commands commands = commandsmanager.Commands;
+            try
+            {
+            CommandsCollection commands = commandsmanager.Commands;
             StringBuilder input = new StringBuilder();
             int currentIndex = 0;
 
@@ -239,7 +248,13 @@ namespace command_box
                             Console.SetCursorPosition(promptLength + currentIndex, Console.CursorTop);
                         }
                         continue;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.Instance.LogException(typeof(Program), ex);
+                return string.Empty;
             }
         }
 

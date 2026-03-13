@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using command_box.Enums;
-using Newtonsoft.Json;
+using command_box.Interfaces;
 
-namespace command_box
+namespace command_box.Commands
 {
     public class Command : ICommand
     {
@@ -11,12 +11,9 @@ namespace command_box
         public string CommandPath { get; }
         public string Usage { get; }
         public CommandType Type { get; }
-        
-        [JsonIgnore]
-        public Action<string[]> Action { get; set; }
         public override string ToString() => $"{Name}";
 
-        public Command(string name, string description, string commandPath, string usage, CommandType type) 
+        public Command(string name, string description, string commandPath, string usage, CommandType type)
         { 
             Name = name;
             Description = description;
@@ -26,19 +23,6 @@ namespace command_box
         }
 
         public void Execute(string[] args)
-        {
-            switch (Type)
-            { 
-                case CommandType.Internal:
-                    Action?.Invoke(args);
-                    break;
-                default:
-                    RunProcess(args);
-                    break;
-            }
-        }
-
-        private void RunProcess(string[] args)
         {
             ProcessStartInfo psi = new ProcessStartInfo();
             string argString = string.Join(" ", args);
@@ -57,6 +41,10 @@ namespace command_box
                     psi.FileName = "python";
                     psi.Arguments = $"\"{CommandPath}\" {argString}";
                     break;
+                case CommandType.Executable:
+                    psi.FileName = CommandPath;
+                    psi.Arguments = argString;
+                    break;
             }
 
             psi.RedirectStandardOutput = false; // Let output go directly to console
@@ -67,7 +55,7 @@ namespace command_box
 
             using (Process process = Process.Start(psi))
             {
-                process.WaitForExit();
+                process?.WaitForExit();
             }
         }
     }
