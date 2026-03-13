@@ -15,6 +15,7 @@ namespace command_box.InternalCommands
     {
         private readonly string _cacheFilePath = Paths.Cache;
         private readonly string _scriptsDirectory = Paths.ScriptsDir;
+        private readonly string _exeDirectory = Paths.ExeDir;
         public string Name => "cache";
         public string Description => "Manages the cache (save, load, refresh, clear).";
         public string CommandPath => throw new NotImplementedException();
@@ -55,7 +56,7 @@ namespace command_box.InternalCommands
                     Commands.ClearCache(_cacheFilePath);
                     break;
                 case "refresh":
-                    Commands.RefreshCache(_scriptsDirectory, _cacheFilePath);
+                    Commands.RefreshCache( new string []{ _scriptsDirectory, _exeDirectory}, _cacheFilePath);
                     break;
                 default:
                     WriteLine("Usage: cache [save|load|refresh|clear]");
