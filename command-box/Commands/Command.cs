@@ -41,6 +41,10 @@ namespace command_box.Commands
                     psi.FileName = "python";
                     psi.Arguments = $"\"{CommandPath}\" {argString}";
                     break;
+                case CommandType.Executable:
+                    psi.FileName = CommandPath;
+                    psi.Arguments = argString;
+                    break;
             }
 
             psi.RedirectStandardOutput = false; // Let output go directly to console
